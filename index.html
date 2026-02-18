@@ -8,10 +8,27 @@
       * { margin: 0; padding: 0; box-sizing: border-box; }
       body { background: #1a1a2e; display: flex; justify-content: center; align-items: center; height: 100vh; }
       canvas { border: 1px solid #333; cursor: crosshair; }
+      #app { position: relative; display: inline-block; }
+      #download-svg {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        padding: 6px 12px;
+        background: #e94560;
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+      }
+      #download-svg:hover { background: #c73650; }
     </style>
   </head>
   <body>
-    <canvas id="plume-canvas"></canvas>
+    <div id="app">
+      <canvas id="plume-canvas"></canvas>
+    </div>
+    <button id="download-svg">Download SVG</button>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

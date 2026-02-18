@@ -1,4 +1,4 @@
-import { Vector2, Scene, View, Polyline, Canvas2DRenderer } from '@plume/index'
+import { Vector2, Scene, View, Polyline, Canvas2DRenderer, SVGRenderer } from '@plume/index'
 import { InputHandler } from './InputHandler'
 
 const canvasEl = document.querySelector<HTMLCanvasElement>('#plume-canvas')!
@@ -61,3 +61,16 @@ function render() {
 }
 
 render()
+
+// --- SVG Export ---
+const svgRenderer = new SVGRenderer(800, 600)
+document.querySelector('#download-svg')!.addEventListener('click', () => {
+  svgRenderer.render(scene, view)
+  const blob = new Blob([svgRenderer.svg], { type: 'image/svg+xml' })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = 'plume-scene.svg'
+  a.click()
+  URL.revokeObjectURL(url)
+})

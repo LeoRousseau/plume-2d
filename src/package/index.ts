@@ -15,3 +15,4 @@ export { Polyline } from './shapes/Polyline'
 // Rendering
 export type { IRenderer } from './rendering/IRenderer'
 export { Canvas2DRenderer } from './rendering/Canvas2DRenderer'
+export { SVGRenderer } from './rendering/SVGRenderer'
