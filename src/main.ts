@@ -1,4 +1,5 @@
 import { Vector2, Scene, View, Polyline, Canvas2DRenderer } from '@plume/index'
+import { InputHandler } from './InputHandler'
 
 const canvasEl = document.querySelector<HTMLCanvasElement>('#plume-canvas')!
 canvasEl.width = 800
@@ -18,19 +19,13 @@ triangle.strokeWidth = 2
 triangle.fillColor = 'rgba(233, 69, 96, 0.15)'
 scene.root.addChild(triangle)
 
+// --- Input ---
+const input = new InputHandler(canvasEl, view, render)
+
 // Click to add polylines
 let currentPoints: Vector2[] = []
 
-canvasEl.addEventListener('click', (e) => {
-  const rect = canvasEl.getBoundingClientRect()
-  const pos = new Vector2(e.clientX - rect.left, e.clientY - rect.top)
-
-  // Convert screen to scene coords
-  const scenePos = new Vector2(
-    (pos.x - canvasEl.width / 2) / view.zoom + view.center.x,
-    (pos.y - canvasEl.height / 2) / view.zoom + view.center.y,
-  )
-
+input.onClick = (scenePos) => {
   currentPoints.push(scenePos)
 
   if (currentPoints.length >= 2) {
@@ -47,9 +42,9 @@ canvasEl.addEventListener('click', (e) => {
   }
 
   render()
-})
+}
 
-canvasEl.addEventListener('dblclick', () => {
+input.onDblClick = () => {
   if (currentPoints.length >= 3) {
     const last = scene.root.children[scene.root.children.length - 1]
     if (last instanceof Polyline) {
@@ -59,7 +54,7 @@ canvasEl.addEventListener('dblclick', () => {
   }
   currentPoints = []
   render()
-})
+}
 
 function render() {
   renderer.render(scene, view)
