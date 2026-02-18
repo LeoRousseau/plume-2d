@@ -6,13 +6,13 @@ export { Matrix } from './math/Matrix'
 export { Node } from './core/Node'
 export { Transform } from './core/Transform'
 export { Scene } from './core/Scene'
-export { View } from './core/View'
-
-// Shapes
-export { Shape } from './shapes/Shape'
-export { Polyline } from './shapes/Polyline'
+export { Shape } from './core/Shape'
+export { Polyline } from './core/Polyline'
 
 // Rendering
+export { View } from './rendering/View'
 export type { IRenderer } from './rendering/IRenderer'
-export { Canvas2DRenderer } from './rendering/Canvas2DRenderer'
-export { SVGRenderer } from './rendering/SVGRenderer'
+
+// Renderers
+export { Canvas2DRenderer } from './renderer/Canvas2DRenderer'
+export { SVGRenderer } from './renderer/SVGRenderer'

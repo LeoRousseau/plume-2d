@@ -1,9 +1,9 @@
 import { Node } from '../core/Node'
 import type { Scene } from '../core/Scene'
-import type { View } from '../core/View'
-import { Shape } from '../shapes/Shape'
-import type { Polyline } from '../shapes/Polyline'
-import type { IRenderer } from './IRenderer'
+import type { View } from '../rendering/View'
+import { Shape } from '../core/Shape'
+import type { Polyline } from '../core/Polyline'
+import type { IRenderer } from '../rendering/IRenderer'
 
 export class Canvas2DRenderer implements IRenderer {
   private ctx: CanvasRenderingContext2D
