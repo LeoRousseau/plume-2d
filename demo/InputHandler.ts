@@ -13,6 +13,7 @@ export class InputHandler {
   // public callbacks
   onClick: ((scenePos: Vector2) => void) | null = null
   onDblClick: ((scenePos: Vector2) => void) | null = null
+  onMouseMove: ((scenePos: Vector2) => void) | null = null
 
   // bound handlers (for dispose)
   private handleWheel: (e: WheelEvent) => void
@@ -21,6 +22,7 @@ export class InputHandler {
   private handlePointerUp: (e: PointerEvent) => void
   private handleClick: (e: MouseEvent) => void
   private handleDblClick: (e: MouseEvent) => void
+  private handleMouseMove: (e: MouseEvent) => void
 
   constructor(canvas: HTMLCanvasElement, view: View, onUpdate: () => void) {
     this.canvas = canvas
@@ -82,12 +84,17 @@ export class InputHandler {
       this.onDblClick?.(this.screenToScene(e.clientX, e.clientY))
     }
 
+    this.handleMouseMove = (e: MouseEvent) => {
+      this.onMouseMove?.(this.screenToScene(e.clientX, e.clientY))
+    }
+
     this.canvas.addEventListener('wheel', this.handleWheel, { passive: false })
     this.canvas.addEventListener('pointerdown', this.handlePointerDown)
     this.canvas.addEventListener('pointermove', this.handlePointerMove)
     this.canvas.addEventListener('pointerup', this.handlePointerUp)
     this.canvas.addEventListener('click', this.handleClick)
     this.canvas.addEventListener('dblclick', this.handleDblClick)
+    this.canvas.addEventListener('mousemove', this.handleMouseMove)
   }
 
   screenToScene(screenX: number, screenY: number): Vector2 {
@@ -107,5 +114,6 @@ export class InputHandler {
     this.canvas.removeEventListener('pointerup', this.handlePointerUp)
     this.canvas.removeEventListener('click', this.handleClick)
     this.canvas.removeEventListener('dblclick', this.handleDblClick)
+    this.canvas.removeEventListener('mousemove', this.handleMouseMove)
   }
 }

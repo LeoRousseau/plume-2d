@@ -1,11 +1,11 @@
 import {
   Vector2, Scene, View, Polyline, Circle, Rectangle, Ellipse, Arc, Path, Text,
-  Canvas2DRenderer, SVGRenderer, BoundingBox,
+  Canvas2DRenderer, SVGRenderer, BoundingBox, hitTest,
   intersectLineLine, intersectLineCircle, intersectCircleCircle,
   distancePointToPolyline, distancePointToCircle, closestPointOnPolyline,
   snap,
 } from '@plume/index'
-import type { Shape } from '@plume/index'
+import type { AShape, HitTestResult } from '@plume/index'
 import { InputHandler } from './InputHandler'
 
 // --- Setup ---
@@ -27,9 +27,15 @@ let overlays: (() => void)[] = []
 let drawMode: 'polyline' | null = null
 let currentPoints: Vector2[] = []
 let snapEnabled = false
+let hitTestEnabled = false
+let snapVisualEnabled = false
+
+// Live state for mouse-move overlays
+let hitTestOverlay: (() => void) | null = null
+let snapOverlay: (() => void) | null = null
 
 // --- Helpers ---
-function addShape(s: Shape) {
+function addShape(s: AShape) {
   scene.root.addChild(s)
   render()
 }
@@ -55,10 +61,137 @@ function render() {
   ctx.translate(offsetX, offsetY)
   ctx.scale(view.zoom, view.zoom)
   for (const fn of overlays) fn()
+  if (hitTestOverlay) hitTestOverlay()
+  if (snapOverlay) snapOverlay()
   ctx.restore()
 }
 
 function getCtx() { return canvasEl.getContext('2d')! }
+
+// --- Mouse move: HitTest + Snap visual feedback ---
+input.onMouseMove = (scenePos) => {
+  hitTestOverlay = null
+  snapOverlay = null
+
+  if (hitTestEnabled) {
+    const result = hitTest(scene.root, scenePos, 4 / view.zoom)
+    if (result) {
+      const bb = result.shape.getBoundingBox()
+      const shapeName = result.shape.constructor.name
+      hitTestOverlay = () => {
+        const ctx = getCtx()
+        // Highlight bounding box
+        ctx.strokeStyle = '#0f0'
+        ctx.lineWidth = 2 / view.zoom
+        ctx.setLineDash([6 / view.zoom, 3 / view.zoom])
+        ctx.strokeRect(bb.min.x, bb.min.y, bb.width, bb.height)
+        ctx.setLineDash([])
+
+        // Crosshair at hit point
+        const hp = result.point
+        const s = 8 / view.zoom
+        ctx.strokeStyle = '#0f0'
+        ctx.lineWidth = 1 / view.zoom
+        ctx.beginPath()
+        ctx.moveTo(hp.x - s, hp.y); ctx.lineTo(hp.x + s, hp.y)
+        ctx.moveTo(hp.x, hp.y - s); ctx.lineTo(hp.x, hp.y + s)
+        ctx.stroke()
+
+        // Label
+        ctx.fillStyle = '#0f0'
+        ctx.font = `${11 / view.zoom}px monospace`
+        ctx.fillText(
+          `${shapeName} (${hp.x.toFixed(0)}, ${hp.y.toFixed(0)})`,
+          bb.min.x,
+          bb.min.y - 5 / view.zoom,
+        )
+      }
+      showInfo(`HitTest: ${shapeName} at (${result.point.x.toFixed(1)}, ${result.point.y.toFixed(1)})`)
+    } else {
+      showInfo('HitTest: no shape under cursor')
+    }
+  }
+
+  if (snapVisualEnabled || (snapEnabled && drawMode === 'polyline')) {
+    const shapes = scene.root.children.filter((c): c is AShape =>
+      c instanceof Polyline || c instanceof Circle || c instanceof Rectangle || c instanceof Ellipse
+    )
+    const result = snap(scenePos, shapes, { gridSize: 20, tolerance: 15 / view.zoom })
+    if (result) {
+      const sp = result.point
+      const type = result.type
+      snapOverlay = () => {
+        const ctx = getCtx()
+        const r = 6 / view.zoom
+
+        // Snap marker
+        if (type === 'grid') {
+          // Diamond for grid
+          ctx.strokeStyle = '#fa0'
+          ctx.lineWidth = 1.5 / view.zoom
+          ctx.beginPath()
+          ctx.moveTo(sp.x, sp.y - r)
+          ctx.lineTo(sp.x + r, sp.y)
+          ctx.lineTo(sp.x, sp.y + r)
+          ctx.lineTo(sp.x - r, sp.y)
+          ctx.closePath()
+          ctx.stroke()
+        } else if (type === 'point') {
+          // Square for point
+          ctx.strokeStyle = '#0ff'
+          ctx.lineWidth = 1.5 / view.zoom
+          ctx.strokeRect(sp.x - r, sp.y - r, r * 2, r * 2)
+        } else if (type === 'center') {
+          // Circle + cross for center
+          ctx.strokeStyle = '#f0f'
+          ctx.lineWidth = 1.5 / view.zoom
+          ctx.beginPath()
+          ctx.arc(sp.x, sp.y, r, 0, Math.PI * 2)
+          ctx.stroke()
+          ctx.beginPath()
+          ctx.moveTo(sp.x - r, sp.y); ctx.lineTo(sp.x + r, sp.y)
+          ctx.moveTo(sp.x, sp.y - r); ctx.lineTo(sp.x, sp.y + r)
+          ctx.stroke()
+        } else if (type === 'edge') {
+          // X for edge
+          ctx.strokeStyle = '#0f0'
+          ctx.lineWidth = 1.5 / view.zoom
+          ctx.beginPath()
+          ctx.moveTo(sp.x - r, sp.y - r); ctx.lineTo(sp.x + r, sp.y + r)
+          ctx.moveTo(sp.x + r, sp.y - r); ctx.lineTo(sp.x - r, sp.y + r)
+          ctx.stroke()
+        } else {
+          // Circle for intersection / other
+          ctx.fillStyle = '#f00'
+          ctx.beginPath()
+          ctx.arc(sp.x, sp.y, r * 0.7, 0, Math.PI * 2)
+          ctx.fill()
+        }
+
+        // Dashed line from cursor to snap point
+        ctx.strokeStyle = 'rgba(255,255,255,0.3)'
+        ctx.lineWidth = 1 / view.zoom
+        ctx.setLineDash([3 / view.zoom, 2 / view.zoom])
+        ctx.beginPath()
+        ctx.moveTo(scenePos.x, scenePos.y)
+        ctx.lineTo(sp.x, sp.y)
+        ctx.stroke()
+        ctx.setLineDash([])
+
+        // Label
+        ctx.fillStyle = 'rgba(255,255,255,0.7)'
+        ctx.font = `${10 / view.zoom}px monospace`
+        ctx.fillText(`${type} (${sp.x.toFixed(0)}, ${sp.y.toFixed(0)})`, sp.x + 10 / view.zoom, sp.y - 6 / view.zoom)
+      }
+
+      if (!hitTestEnabled) {
+        showInfo(`Snap: ${type} at (${sp.x.toFixed(1)}, ${sp.y.toFixed(1)}) d=${result.distance.toFixed(1)}`)
+      }
+    }
+  }
+
+  render()
+}
 
 // --- Buttons: Primitives ---
 
@@ -67,7 +200,7 @@ document.querySelector('#btn-circle')!.addEventListener('click', () => {
   c.stroke = { color: randomColor(), width: 2 }
   c.fill = { color: 'rgba(255,255,255,0.05)' }
   addShape(c)
-  showInfo(`Circle r=${c.radius.toFixed(0)} area=${c.area().toFixed(1)} circ=${c.circumference().toFixed(1)}`)
+  showInfo(`Circle r=${c.radius.toFixed(0)} area=${c.area().toFixed(1)} perim=${c.perimeter().toFixed(1)}`)
 })
 
 document.querySelector('#btn-rect')!.addEventListener('click', () => {
@@ -96,7 +229,7 @@ document.querySelector('#btn-arc')!.addEventListener('click', () => {
   const a = new Arc(new Vector2(randomX(), randomY()), 40 + Math.random() * 50, startAngle, endAngle)
   a.stroke = { color: randomColor(), width: 2 }
   addShape(a)
-  showInfo(`Arc r=${a.radius.toFixed(0)} len=${a.arcLength().toFixed(1)}`)
+  showInfo(`Arc r=${a.radius.toFixed(0)} perim=${a.perimeter().toFixed(1)} area=${a.area().toFixed(1)}`)
 })
 
 document.querySelector('#btn-path')!.addEventListener('click', () => {
@@ -114,7 +247,7 @@ document.querySelector('#btn-path')!.addEventListener('click', () => {
     )
   p.stroke = { color: randomColor(), width: 2 }
   addShape(p)
-  showInfo(`Path segments=${p.segments.length} len=${p.length().toFixed(1)}`)
+  showInfo(`Path segments=${p.segments.length} perim=${p.perimeter().toFixed(1)}`)
 })
 
 document.querySelector('#btn-text')!.addEventListener('click', () => {
@@ -140,7 +273,7 @@ input.onClick = (scenePos) => {
   if (drawMode !== 'polyline') return
 
   if (snapEnabled) {
-    const shapes = scene.root.children.filter((c): c is Shape => c instanceof Polyline || c instanceof Circle || c instanceof Rectangle || c instanceof Ellipse)
+    const shapes = scene.root.children.filter((c): c is AShape => c instanceof Polyline || c instanceof Circle || c instanceof Rectangle || c instanceof Ellipse)
     const result = snap(scenePos, shapes, { gridSize: 20, tolerance: 15 / view.zoom })
     if (result) {
       scenePos = result.point
@@ -172,7 +305,7 @@ input.onDblClick = () => {
       last.isClosed = true
       last.fill = { color: 'rgba(0, 255, 255, 0.1)' }
       delete (last as any)._drawing
-      showInfo(`Polyline closed. area=${last.area().toFixed(1)} length=${last.length().toFixed(1)}`)
+      showInfo(`Polyline closed. area=${last.area().toFixed(1)} perim=${last.perimeter().toFixed(1)}`)
     }
   }
   currentPoints = []
@@ -236,7 +369,7 @@ document.querySelector('#btn-bbox')!.addEventListener('click', () => {
   overlays = []
   for (const child of scene.root.children) {
     if ('getBoundingBox' in child) {
-      const shape = child as Shape
+      const shape = child as AShape
       const bb = shape.getBoundingBox()
       overlays.push(() => {
         const ctx = getCtx()
@@ -435,11 +568,29 @@ document.querySelector('#btn-snap')!.addEventListener('click', () => {
   showInfo(snapEnabled ? 'Snap ON (grid=20, points, edges, centers)' : 'Snap OFF')
 })
 
+// --- HitTest toggle ---
+document.querySelector('#btn-hittest')!.addEventListener('click', () => {
+  hitTestEnabled = !hitTestEnabled
+  document.querySelector('#btn-hittest')!.classList.toggle('active', hitTestEnabled)
+  if (!hitTestEnabled) { hitTestOverlay = null; render() }
+  showInfo(hitTestEnabled ? 'HitTest ON - move mouse over shapes' : 'HitTest OFF')
+})
+
+// --- Snap visual toggle ---
+document.querySelector('#btn-snap-visual')!.addEventListener('click', () => {
+  snapVisualEnabled = !snapVisualEnabled
+  document.querySelector('#btn-snap-visual')!.classList.toggle('active', snapVisualEnabled)
+  if (!snapVisualEnabled) { snapOverlay = null; render() }
+  showInfo(snapVisualEnabled ? 'Snap visual ON - move mouse to see snap targets' : 'Snap visual OFF')
+})
+
 // --- Scene ---
 document.querySelector('#btn-clear')!.addEventListener('click', () => {
   scene.root.children.slice().forEach(c => scene.root.removeChild(c))
   overlays = []
   currentPoints = []
+  hitTestOverlay = null
+  snapOverlay = null
   render()
   showInfo('Scene cleared')
 })
