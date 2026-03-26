@@ -3,8 +3,13 @@ import { BoundingBox } from '../math/BoundingBox'
 import type { IRenderer } from '../rendering/IRenderer'
 import { Shape } from './Shape'
 
+/**
+ * A shape defined by an ordered list of 2D points.
+ * Can be open (polyline) or closed (polygon).
+ */
 export class Polyline extends Shape {
   points: Vector2[]
+  /** If `true`, the last point connects back to the first. */
   isClosed: boolean
 
   constructor(points: Vector2[] = [], isClosed = false) {
@@ -21,6 +26,7 @@ export class Polyline extends Shape {
     return BoundingBox.fromPoints(this.points)
   }
 
+  /** Total length of all segments (including the closing segment if closed). */
   length(): number {
     let total = 0
     for (let i = 1; i < this.points.length; i++) {
@@ -32,11 +38,13 @@ export class Polyline extends Shape {
     return total
   }
 
+  /** Number of line segments. */
   segmentCount(): number {
     if (this.points.length < 2) return 0
     return this.isClosed ? this.points.length : this.points.length - 1
   }
 
+  /** Returns the `[start, end]` points of the segment at the given index. */
   segmentAt(index: number): [Vector2, Vector2] {
     const count = this.segmentCount()
     if (index < 0 || index >= count) throw new RangeError(`Segment index ${index} out of range [0, ${count})`)
@@ -45,6 +53,10 @@ export class Polyline extends Shape {
     return [a, b]
   }
 
+  /**
+   * Returns the point located at the given distance along the polyline path.
+   * Clamps to the start or end if `d` is out of range.
+   */
   pointAtDistance(d: number): Vector2 {
     if (this.points.length === 0) throw new Error('Empty polyline')
     if (this.points.length === 1) return this.points[0].clone()
@@ -61,10 +73,10 @@ export class Polyline extends Shape {
       }
       remaining -= segLen
     }
-    // Past the end: return last point (or first if closed)
     return this.isClosed ? this.points[0].clone() : this.points[this.points.length - 1].clone()
   }
 
+  /** Signed area using the shoelace formula. Returns 0 if not closed or fewer than 3 points. */
   area(): number {
     if (!this.isClosed || this.points.length < 3) return 0
     let sum = 0
@@ -77,6 +89,7 @@ export class Polyline extends Shape {
     return Math.abs(sum) / 2
   }
 
+  /** Average of all vertices. */
   centroid(): Vector2 {
     if (this.points.length === 0) return new Vector2()
     let cx = 0, cy = 0
@@ -87,9 +100,12 @@ export class Polyline extends Shape {
     return new Vector2(cx / this.points.length, cy / this.points.length)
   }
 
+  /**
+   * Ray-casting point-in-polygon test.
+   * Always returns `false` for open polylines.
+   */
   containsPoint(p: Vector2): boolean {
     if (!this.isClosed || this.points.length < 3) return false
-    // Ray-casting algorithm
     let inside = false
     const n = this.points.length
     for (let i = 0, j = n - 1; i < n; j = i++) {
@@ -102,6 +118,10 @@ export class Polyline extends Shape {
     return inside
   }
 
+  /**
+   * Returns a simplified copy using the Douglas-Peucker algorithm.
+   * @param tolerance - Maximum allowed perpendicular distance.
+   */
   simplify(tolerance: number): Polyline {
     if (this.points.length <= 2) return new Polyline([...this.points], this.isClosed)
     const kept = douglasPeucker(this.points, tolerance)
@@ -111,6 +131,7 @@ export class Polyline extends Shape {
     return result
   }
 
+  /** Returns a new polyline with the point order reversed. */
   reverse(): Polyline {
     const result = new Polyline([...this.points].reverse(), this.isClosed)
     result.stroke = { ...this.stroke }

@@ -2,6 +2,7 @@ import { Vector2 } from '../math/Vector2'
 import type { Polyline } from '../core/Polyline'
 import type { Circle } from '../core/Circle'
 
+/** Returns the closest point on a line segment `[lineStart, lineEnd]` to `point`. */
 export function closestPointOnLine(point: Vector2, lineStart: Vector2, lineEnd: Vector2): Vector2 {
   const ab = lineEnd.sub(lineStart)
   const lengthSq = ab.dot(ab)
@@ -10,10 +11,12 @@ export function closestPointOnLine(point: Vector2, lineStart: Vector2, lineEnd: 
   return lineStart.add(ab.scale(t))
 }
 
+/** Shortest distance from `point` to the line segment `[lineStart, lineEnd]`. */
 export function distancePointToLine(point: Vector2, lineStart: Vector2, lineEnd: Vector2): number {
   return point.distanceTo(closestPointOnLine(point, lineStart, lineEnd))
 }
 
+/** Returns the closest point on any segment of a {@link Polyline} to `point`. */
 export function closestPointOnPolyline(point: Vector2, polyline: Polyline): Vector2 {
   let bestDist = Infinity
   let bestPoint = polyline.points[0] ?? new Vector2()
@@ -30,10 +33,12 @@ export function closestPointOnPolyline(point: Vector2, polyline: Polyline): Vect
   return bestPoint
 }
 
+/** Shortest distance from `point` to any segment of a {@link Polyline}. */
 export function distancePointToPolyline(point: Vector2, polyline: Polyline): number {
   return point.distanceTo(closestPointOnPolyline(point, polyline))
 }
 
+/** Shortest distance from `point` to the circumference of a {@link Circle}. */
 export function distancePointToCircle(point: Vector2, circle: Circle): number {
   return Math.abs(point.distanceTo(circle.center) - circle.radius)
 }

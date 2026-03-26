@@ -4,7 +4,9 @@ import type { IRenderer } from '../rendering/IRenderer'
 import { Shape } from './Shape'
 import { Polyline } from './Polyline'
 
+/** An axis-aligned rectangle defined by its top-left origin, width, and height. */
 export class Rectangle extends Shape {
+  /** Top-left corner. */
   origin: Vector2
   width: number
   height: number
@@ -27,14 +29,17 @@ export class Rectangle extends Shape {
     )
   }
 
+  /** `width × height` */
   area(): number {
     return this.width * this.height
   }
 
+  /** `2 × (width + height)` */
   perimeter(): number {
     return 2 * (this.width + this.height)
   }
 
+  /** Returns `true` if the point lies inside or on the edge. */
   containsPoint(p: Vector2): boolean {
     return (
       p.x >= this.origin.x &&
@@ -44,6 +49,7 @@ export class Rectangle extends Shape {
     )
   }
 
+  /** Converts this rectangle to a closed 4-point {@link Polyline}. */
   toPolyline(): Polyline {
     const { x, y } = this.origin
     return new Polyline(

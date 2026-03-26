@@ -6,20 +6,28 @@ import { Rectangle } from '../core/Rectangle'
 import { Ellipse } from '../core/Ellipse'
 import { closestPointOnPolyline } from './distance'
 
+/** The kind of geometry feature the snap locked onto. */
 export type SnapType = 'grid' | 'point' | 'edge' | 'center' | 'intersection'
 
+/** Result returned by {@link snap} when a candidate is found within tolerance. */
 export interface SnapResult {
+  /** The snapped-to point. */
   point: Vector2
+  /** Which feature type was snapped to. */
   type: SnapType
+  /** Distance from the original point to the snapped point. */
   distance: number
 }
 
+/** Options controlling which snap targets are active. */
 export interface SnapOptions {
+  /** Grid spacing in scene units (default 10). */
   gridSize?: number
   snapToGrid?: boolean
   snapToPoints?: boolean
   snapToEdges?: boolean
   snapToCenters?: boolean
+  /** Maximum snap distance in scene units (default 15). */
   tolerance?: number
 }
 
@@ -32,6 +40,14 @@ const defaultOptions: Required<SnapOptions> = {
   tolerance: 15,
 }
 
+/**
+ * Finds the nearest snap target for a given point.
+ *
+ * @param point   - The point to snap (e.g. cursor position in scene coords).
+ * @param shapes  - Shapes to consider for point/edge/center snapping.
+ * @param options - Snap configuration.
+ * @returns The closest snap candidate within tolerance, or `null`.
+ */
 export function snap(point: Vector2, shapes: Shape[], options: SnapOptions = {}): SnapResult | null {
   const opts = { ...defaultOptions, ...options }
   const candidates: SnapResult[] = []
@@ -63,7 +79,6 @@ export function snap(point: Vector2, shapes: Shape[], options: SnapOptions = {})
     }
   }
 
-  // Filter by tolerance and return closest
   const valid = candidates.filter((c) => c.distance <= opts.tolerance)
   if (valid.length === 0) return null
   valid.sort((a, b) => a.distance - b.distance)

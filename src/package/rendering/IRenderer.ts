@@ -7,7 +7,9 @@ import type { Ellipse } from '../core/Ellipse'
 import type { Arc } from '../core/Arc'
 import type { Path } from '../core/Path'
 
+/** Interface that all rendering backends must implement. */
 export interface IRenderer {
+  /** Renders the entire scene from the given viewpoint. */
   render(scene: Scene, view: View): void
   drawPolyline(polyline: Polyline): void
   drawCircle(circle: Circle): void

@@ -38,6 +38,18 @@ describe('Arc', () => {
     expect(bb.max.y).toBeCloseTo(10)
   })
 
+  it('containsPoint on the arc curve', () => {
+    const a = new Arc(new Vector2(0, 0), 10, 0, Math.PI / 2)
+    // Point on the arc at angle 0 (10, 0)
+    expect(a.containsPoint(new Vector2(10, 0))).toBe(true)
+    // Point on the arc at angle π/4
+    expect(a.containsPoint(new Vector2(10 * Math.cos(Math.PI / 4), 10 * Math.sin(Math.PI / 4)))).toBe(true)
+    // Point far from the arc
+    expect(a.containsPoint(new Vector2(0, 0))).toBe(false)
+    // Point at correct distance but wrong angle
+    expect(a.containsPoint(new Vector2(-10, 0))).toBe(false)
+  })
+
   it('calls renderer.drawArc on draw', () => {
     const a = new Arc()
     a.draw(mockRenderer)

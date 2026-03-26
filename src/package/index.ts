@@ -17,6 +17,8 @@ export { Path } from './core/Path'
 export type { PathSegment } from './core/PathSegment'
 export type { StrokeStyle } from './core/StrokeStyle'
 export type { FillStyle } from './core/FillStyle'
+export { hitTest } from './core/HitTest'
+export type { HitTestResult } from './core/HitTest'
 
 // Rendering
 export { View } from './rendering/View'

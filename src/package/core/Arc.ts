@@ -3,10 +3,13 @@ import { BoundingBox } from '../math/BoundingBox'
 import type { IRenderer } from '../rendering/IRenderer'
 import { Shape } from './Shape'
 
+/** A circular arc defined by center, radius, start angle and end angle (in radians). */
 export class Arc extends Shape {
   center: Vector2
   radius: number
+  /** Start angle in radians. */
   startAngle: number
+  /** End angle in radians. */
   endAngle: number
 
   constructor(
@@ -28,7 +31,6 @@ export class Arc extends Shape {
 
   getBoundingBox(): BoundingBox {
     const points = [this.startPoint(), this.endPoint()]
-    // Check if arc crosses 0, π/2, π, 3π/2
     const angles = [0, Math.PI / 2, Math.PI, (3 * Math.PI) / 2]
     for (const a of angles) {
       if (this.containsAngle(a)) {
@@ -41,12 +43,14 @@ export class Arc extends Shape {
     return BoundingBox.fromPoints(points)
   }
 
+  /** Arc length: `radius × sweep`. */
   arcLength(): number {
     let sweep = this.endAngle - this.startAngle
     if (sweep < 0) sweep += Math.PI * 2
     return this.radius * sweep
   }
 
+  /** Point at the start of the arc. */
   startPoint(): Vector2 {
     return new Vector2(
       this.center.x + this.radius * Math.cos(this.startAngle),
@@ -54,11 +58,23 @@ export class Arc extends Shape {
     )
   }
 
+  /** Point at the end of the arc. */
   endPoint(): Vector2 {
     return new Vector2(
       this.center.x + this.radius * Math.cos(this.endAngle),
       this.center.y + this.radius * Math.sin(this.endAngle),
     )
+  }
+
+  /**
+   * Returns `true` if a point lies on the arc curve within `tolerance` pixels.
+   * Checks both distance from center ≈ radius and that the angle falls within the sweep.
+   */
+  containsPoint(p: Vector2, tolerance: number = 1): boolean {
+    const dist = p.distanceTo(this.center)
+    if (Math.abs(dist - this.radius) > tolerance) return false
+    const angle = Math.atan2(p.y - this.center.y, p.x - this.center.x)
+    return this.containsAngle(angle)
   }
 
   private containsAngle(angle: number): boolean {

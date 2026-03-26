@@ -3,9 +3,12 @@ import { BoundingBox } from '../math/BoundingBox'
 import type { IRenderer } from '../rendering/IRenderer'
 import { Shape } from './Shape'
 
+/** An axis-aligned ellipse defined by center and two radii. */
 export class Ellipse extends Shape {
   center: Vector2
+  /** Horizontal radius. */
   rx: number
+  /** Vertical radius. */
   ry: number
 
   constructor(center: Vector2 = new Vector2(), rx: number = 1, ry: number = 1) {
@@ -26,18 +29,20 @@ export class Ellipse extends Shape {
     )
   }
 
+  /** `π × rx × ry` */
   area(): number {
     return Math.PI * this.rx * this.ry
   }
 
+  /** Approximate perimeter using Ramanujan's formula. */
   perimeter(): number {
-    // Ramanujan approximation
     const a = this.rx
     const b = this.ry
     const h = ((a - b) * (a - b)) / ((a + b) * (a + b))
     return Math.PI * (a + b) * (1 + (3 * h) / (10 + Math.sqrt(4 - 3 * h)))
   }
 
+  /** Returns `true` if the point lies inside or on the ellipse boundary. */
   containsPoint(p: Vector2): boolean {
     const dx = p.x - this.center.x
     const dy = p.y - this.center.y

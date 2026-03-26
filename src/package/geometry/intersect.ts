@@ -1,7 +1,10 @@
 import { Vector2 } from '../math/Vector2'
-import type { Circle } from '../core/Circle'
 import type { BoundingBox } from '../math/BoundingBox'
 
+/**
+ * Finds the intersection point of two line segments, or `null` if they don't intersect.
+ * Segments are `[a1, a2]` and `[b1, b2]`.
+ */
 export function intersectLineLine(
   a1: Vector2, a2: Vector2,
   b1: Vector2, b2: Vector2,
@@ -21,6 +24,10 @@ export function intersectLineLine(
   return null
 }
 
+/**
+ * Finds intersection points between a line segment and a circle.
+ * Returns 0, 1, or 2 points.
+ */
 export function intersectLineCircle(
   lineStart: Vector2, lineEnd: Vector2,
   circle: { center: Vector2; radius: number },
@@ -46,6 +53,10 @@ export function intersectLineCircle(
   return results
 }
 
+/**
+ * Finds intersection points between two circles.
+ * Returns 0, 1 (tangent), or 2 points.
+ */
 export function intersectCircleCircle(
   c1: { center: Vector2; radius: number },
   c2: { center: Vector2; radius: number },
@@ -63,6 +74,7 @@ export function intersectCircleCircle(
   return [mid.add(perp.scale(h)), mid.add(perp.scale(-h))]
 }
 
+/** AABB overlap test (convenience wrapper around {@link BoundingBox.intersects}). */
 export function intersectsAABB(a: BoundingBox, b: BoundingBox): boolean {
   return a.intersects(b)
 }

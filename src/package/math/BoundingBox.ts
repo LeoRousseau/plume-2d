@@ -1,19 +1,25 @@
 import { Vector2 } from './Vector2'
 
+/** Axis-Aligned Bounding Box (AABB). */
 export class BoundingBox {
   constructor(
+    /** Bottom-left corner (minimum x/y). */
     public min: Vector2,
+    /** Top-right corner (maximum x/y). */
     public max: Vector2,
   ) {}
 
+  /** Width of the box (`max.x - min.x`). */
   get width(): number {
     return this.max.x - this.min.x
   }
 
+  /** Height of the box (`max.y - min.y`). */
   get height(): number {
     return this.max.y - this.min.y
   }
 
+  /** Center point of the box. */
   center(): Vector2 {
     return new Vector2(
       (this.min.x + this.max.x) / 2,
@@ -21,10 +27,12 @@ export class BoundingBox {
     )
   }
 
+  /** Returns `true` if the point lies inside or on the edge of this box. */
   containsPoint(p: Vector2): boolean {
     return p.x >= this.min.x && p.x <= this.max.x && p.y >= this.min.y && p.y <= this.max.y
   }
 
+  /** Returns `true` if this box overlaps `other`. */
   intersects(other: BoundingBox): boolean {
     return (
       this.min.x <= other.max.x &&
@@ -34,6 +42,7 @@ export class BoundingBox {
     )
   }
 
+  /** Returns the smallest box containing both `this` and `other`. */
   union(other: BoundingBox): BoundingBox {
     return new BoundingBox(
       new Vector2(Math.min(this.min.x, other.min.x), Math.min(this.min.y, other.min.y)),
@@ -41,6 +50,7 @@ export class BoundingBox {
     )
   }
 
+  /** Returns the smallest box containing `this` and the given point. */
   expand(point: Vector2): BoundingBox {
     return new BoundingBox(
       new Vector2(Math.min(this.min.x, point.x), Math.min(this.min.y, point.y)),
@@ -48,6 +58,7 @@ export class BoundingBox {
     )
   }
 
+  /** Returns a new box expanded by `amount` on every side. */
   pad(amount: number): BoundingBox {
     return new BoundingBox(
       new Vector2(this.min.x - amount, this.min.y - amount),
@@ -55,6 +66,7 @@ export class BoundingBox {
     )
   }
 
+  /** Returns an empty (inverted) bounding box. Useful as an accumulator starting value. */
   static empty(): BoundingBox {
     return new BoundingBox(
       new Vector2(Infinity, Infinity),
@@ -62,6 +74,7 @@ export class BoundingBox {
     )
   }
 
+  /** Creates the tightest AABB enclosing all given points. */
   static fromPoints(points: Vector2[]): BoundingBox {
     if (points.length === 0) return BoundingBox.empty()
     let minX = Infinity,

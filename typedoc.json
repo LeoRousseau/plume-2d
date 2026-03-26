@@ -1,0 +1,13 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "entryPoints": ["src/package/index.ts"],
+  "out": "docs",
+  "name": "Plume 2D",
+  "readme": "none",
+  "tsconfig": "tsconfig.json",
+  "excludePrivate": true,
+  "excludeInternal": true,
+  "navigationLinks": {
+    "GitHub": "https://github.com/plume-2d/plume-2d"
+  }
+}

@@ -51,6 +51,35 @@ describe('Path', () => {
     expect(mockRenderer.drawPath).toHaveBeenCalledWith(p)
   })
 
+  it('containsPoint for closed path', () => {
+    // Closed triangle path
+    const p = new Path()
+      .moveTo(new Vector2(0, 0))
+      .lineTo(new Vector2(10, 0))
+      .lineTo(new Vector2(5, 10))
+      .close()
+    expect(p.containsPoint(new Vector2(5, 3))).toBe(true)
+    expect(p.containsPoint(new Vector2(20, 20))).toBe(false)
+  })
+
+  it('containsPoint returns false for open path', () => {
+    const p = new Path()
+      .moveTo(new Vector2(0, 0))
+      .lineTo(new Vector2(10, 0))
+      .lineTo(new Vector2(5, 10))
+    expect(p.containsPoint(new Vector2(5, 3))).toBe(false)
+  })
+
+  it('toPolylinePoints linearizes curves', () => {
+    const p = new Path()
+      .moveTo(new Vector2(0, 0))
+      .quadraticTo(new Vector2(5, 10), new Vector2(10, 0))
+    const pts = p.toPolylinePoints()
+    expect(pts.length).toBeGreaterThan(2)
+    expect(pts[0].x).toBe(0)
+    expect(pts[pts.length - 1].x).toBeCloseTo(10)
+  })
+
   it('supports quadratic and cubic curves', () => {
     const p = new Path()
       .moveTo(new Vector2(0, 0))
