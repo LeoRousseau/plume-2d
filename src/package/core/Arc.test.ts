@@ -11,6 +11,7 @@ const mockRenderer: IRenderer = {
   drawEllipse: vi.fn(),
   drawArc: vi.fn(),
   drawPath: vi.fn(),
+  drawText: vi.fn(),
 }
 
 describe('Arc', () => {

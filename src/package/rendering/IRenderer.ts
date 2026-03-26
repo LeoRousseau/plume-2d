@@ -6,6 +6,7 @@ import type { Rectangle } from '../core/Rectangle'
 import type { Ellipse } from '../core/Ellipse'
 import type { Arc } from '../core/Arc'
 import type { Path } from '../core/Path'
+import type { Text } from '../core/Text'
 
 /** Interface that all rendering backends must implement. */
 export interface IRenderer {
@@ -17,4 +18,5 @@ export interface IRenderer {
   drawEllipse(ellipse: Ellipse): void
   drawArc(arc: Arc): void
   drawPath(path: Path): void
+  drawText(text: Text): void
 }

@@ -1,5 +1,5 @@
 import {
-  Vector2, Scene, View, Polyline, Circle, Rectangle, Ellipse, Arc, Path,
+  Vector2, Scene, View, Polyline, Circle, Rectangle, Ellipse, Arc, Path, Text,
   Canvas2DRenderer, SVGRenderer, BoundingBox,
   intersectLineLine, intersectLineCircle, intersectCircleCircle,
   distancePointToPolyline, distancePointToCircle, closestPointOnPolyline,
@@ -115,6 +115,17 @@ document.querySelector('#btn-path')!.addEventListener('click', () => {
   p.stroke = { color: randomColor(), width: 2 }
   addShape(p)
   showInfo(`Path segments=${p.segments.length} len=${p.length().toFixed(1)}`)
+})
+
+document.querySelector('#btn-text')!.addEventListener('click', () => {
+  const labels = ['Plume 2D', 'Hello World', 'CAO', 'Label', 'Point A', '42.0m']
+  const label = labels[Math.floor(Math.random() * labels.length)]
+  const sizes = [14, 18, 24, 32, 48]
+  const size = sizes[Math.floor(Math.random() * sizes.length)]
+  const t = new Text(label, new Vector2(randomX(), randomY()), size)
+  t.fill = { color: randomColor() }
+  addShape(t)
+  showInfo(`Text "${label}" ${size}px`)
 })
 
 // --- Polyline draw mode ---

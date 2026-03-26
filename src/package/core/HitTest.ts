@@ -7,6 +7,7 @@ import { Rectangle } from './Rectangle'
 import { Ellipse } from './Ellipse'
 import { Arc } from './Arc'
 import { Path } from './Path'
+import { Text } from './Text'
 
 /** Result returned by {@link hitTest} when a shape is hit. */
 export interface HitTestResult {
@@ -86,6 +87,10 @@ function testShape(shape: Shape, p: Vector2, tolerance: number): boolean {
       return true
     }
     return distanceToPathEdge(shape, p) <= tolerance
+  }
+
+  if (shape instanceof Text) {
+    return shape.getBoundingBox().containsPoint(p)
   }
 
   return false

@@ -8,6 +8,7 @@ import type { Rectangle } from '../core/Rectangle'
 import type { Ellipse } from '../core/Ellipse'
 import type { Arc } from '../core/Arc'
 import type { Path } from '../core/Path'
+import type { Text } from '../core/Text'
 import type { StrokeStyle } from '../core/StrokeStyle'
 import type { FillStyle } from '../core/FillStyle'
 import type { IRenderer } from '../rendering/IRenderer'
@@ -142,6 +143,31 @@ export class SVGRenderer implements IRenderer {
     this.elements.push(
       `  <g transform="${transform}">`,
       `    <path d="${d.trim()}" ${style} />`,
+      `  </g>`,
+    )
+  }
+
+  drawText(text: Text): void {
+    const transform = this.transformStack.join(' ')
+    const attrs: string[] = [
+      `x="${text.position.x}"`,
+      `y="${text.position.y}"`,
+      `font-size="${text.fontSize}"`,
+      `font-family="${text.fontFamily}"`,
+      `text-anchor="${text.textAlign === 'center' ? 'middle' : text.textAlign === 'right' ? 'end' : 'start'}"`,
+      `dominant-baseline="${text.textBaseline === 'middle' ? 'central' : text.textBaseline === 'top' ? 'hanging' : text.textBaseline === 'bottom' ? 'text-bottom' : 'auto'}"`,
+      `fill="${text.fill.color}"`,
+    ]
+    if (text.fill.opacity !== undefined) attrs.push(`fill-opacity="${text.fill.opacity}"`)
+    if (text.stroke.width > 0 && text.stroke.color !== 'transparent') {
+      attrs.push(`stroke="${text.stroke.color}"`, `stroke-width="${text.stroke.width}"`)
+      if (text.stroke.opacity !== undefined) attrs.push(`stroke-opacity="${text.stroke.opacity}"`)
+    }
+    const escaped = text.content.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+
+    this.elements.push(
+      `  <g transform="${transform}">`,
+      `    <text ${attrs.join(' ')}>${escaped}</text>`,
       `  </g>`,
     )
   }

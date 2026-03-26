@@ -8,6 +8,7 @@ import type { Rectangle } from '../core/Rectangle'
 import type { Ellipse } from '../core/Ellipse'
 import type { Arc } from '../core/Arc'
 import type { Path } from '../core/Path'
+import type { Text } from '../core/Text'
 import type { StrokeStyle } from '../core/StrokeStyle'
 import type { FillStyle } from '../core/FillStyle'
 import type { IRenderer } from '../rendering/IRenderer'
@@ -105,6 +106,29 @@ export class Canvas2DRenderer implements IRenderer {
     }
     this.applyFill(path.fill)
     this.applyStroke(path.stroke)
+  }
+
+  drawText(text: Text): void {
+    this.ctx.font = text.font
+    this.ctx.textAlign = text.textAlign
+    this.ctx.textBaseline = text.textBaseline
+
+    if (text.fill.color !== 'transparent') {
+      this.ctx.save()
+      if (text.fill.opacity !== undefined) this.ctx.globalAlpha = text.fill.opacity
+      this.ctx.fillStyle = text.fill.color
+      this.ctx.fillText(text.content, text.position.x, text.position.y)
+      this.ctx.restore()
+    }
+
+    if (text.stroke.width > 0 && text.stroke.color !== 'transparent') {
+      this.ctx.save()
+      if (text.stroke.opacity !== undefined) this.ctx.globalAlpha = text.stroke.opacity
+      this.ctx.strokeStyle = text.stroke.color
+      this.ctx.lineWidth = text.stroke.width
+      this.ctx.strokeText(text.content, text.position.x, text.position.y)
+      this.ctx.restore()
+    }
   }
 
   private applyFill(fill: FillStyle): void {
