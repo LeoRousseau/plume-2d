@@ -1,10 +1,10 @@
 import { Vector2 } from '../math/Vector2'
-import type { Shape } from '../core/Shape'
-import { Polyline } from '../core/Polyline'
-import { Circle } from '../core/Circle'
-import { Rectangle } from '../core/Rectangle'
-import { Ellipse } from '../core/Ellipse'
-import { closestPointOnPolyline } from './distance'
+import type { AShape } from '../entity/Shape'
+import { Polyline } from '../entity/Polyline'
+import { Circle } from '../entity/Circle'
+import { Rectangle } from '../entity/Rectangle'
+import { Ellipse } from '../entity/Ellipse'
+import { closestPointOnPolyline } from '../geometry/distance'
 
 /** The kind of geometry feature the snap locked onto. */
 export type SnapType = 'grid' | 'point' | 'edge' | 'center' | 'intersection'
@@ -48,7 +48,7 @@ const defaultOptions: Required<SnapOptions> = {
  * @param options - Snap configuration.
  * @returns The closest snap candidate within tolerance, or `null`.
  */
-export function snap(point: Vector2, shapes: Shape[], options: SnapOptions = {}): SnapResult | null {
+export function snap(point: Vector2, shapes: AShape[], options: SnapOptions = {}): SnapResult | null {
   const opts = { ...defaultOptions, ...options }
   const candidates: SnapResult[] = []
 
@@ -85,12 +85,12 @@ export function snap(point: Vector2, shapes: Shape[], options: SnapOptions = {})
   return valid[0]
 }
 
-function getShapePoints(shape: Shape): Vector2[] {
+function getShapePoints(shape: AShape): Vector2[] {
   if (shape instanceof Polyline) return shape.points
   return []
 }
 
-function getShapeCenter(shape: Shape): Vector2 | null {
+function getShapeCenter(shape: AShape): Vector2 | null {
   if (shape instanceof Polyline) return shape.centroid()
   if (shape instanceof Circle) return shape.center.clone()
   if (shape instanceof Rectangle) return shape.getBoundingBox().center()

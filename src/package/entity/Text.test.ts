@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { Text } from './Text'
 import { Vector2 } from '../math/Vector2'
-import { Scene } from './Scene'
+import { Scene } from '../core/Scene'
 import type { IRenderer } from '../rendering/IRenderer'
 
 const mockRenderer: IRenderer = {

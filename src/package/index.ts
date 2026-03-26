@@ -7,20 +7,24 @@ export { BoundingBox } from './math/BoundingBox'
 export { Node } from './core/Node'
 export { Transform } from './core/Transform'
 export { Scene } from './core/Scene'
-export { Shape } from './core/Shape'
-export { Polyline } from './core/Polyline'
-export { Circle } from './core/Circle'
-export { Rectangle } from './core/Rectangle'
-export { Ellipse } from './core/Ellipse'
-export { Arc } from './core/Arc'
-export { Path } from './core/Path'
-export { Text } from './core/Text'
-export type { TextAlign, TextBaseline } from './core/Text'
-export type { PathSegment } from './core/PathSegment'
-export type { StrokeStyle } from './core/StrokeStyle'
-export type { FillStyle } from './core/FillStyle'
-export { hitTest } from './core/HitTest'
-export type { HitTestResult } from './core/HitTest'
+
+// Entity
+export { AShape } from './entity/Shape'
+export { Polyline } from './entity/Polyline'
+export { Circle } from './entity/Circle'
+export { Rectangle } from './entity/Rectangle'
+export { Ellipse } from './entity/Ellipse'
+export { Arc } from './entity/Arc'
+export { Path } from './entity/Path'
+export { Text } from './entity/Text'
+export type { TextAlign, TextBaseline } from './entity/Text'
+export type { PathSegment } from './entity/PathSegment'
+export type { StrokeStyle } from './entity/StrokeStyle'
+export type { FillStyle } from './entity/FillStyle'
+
+// Hit Testing
+export { hitTest } from './hitTest/HitTest'
+export type { HitTestResult } from './hitTest/HitTest'
 
 // Rendering
 export { View } from './rendering/View'
@@ -33,5 +37,7 @@ export { SVGRenderer } from './renderer/SVGRenderer'
 // Geometry utilities
 export { distancePointToLine, distancePointToPolyline, distancePointToCircle, closestPointOnLine, closestPointOnPolyline } from './geometry/distance'
 export { intersectLineLine, intersectLineCircle, intersectCircleCircle } from './geometry/intersect'
-export { snap } from './geometry/Snap'
-export type { SnapResult, SnapOptions, SnapType } from './geometry/Snap'
+
+// Snapping
+export { snap } from './snapping/Snap'
+export type { SnapResult, SnapOptions, SnapType } from './snapping/Snap'

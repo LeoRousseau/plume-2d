@@ -1,12 +1,12 @@
 import { describe, it, expect } from 'vitest'
 import { Vector2 } from '../math/Vector2'
-import { Scene } from './Scene'
-import { Polyline } from './Polyline'
-import { Circle } from './Circle'
-import { Rectangle } from './Rectangle'
-import { Ellipse } from './Ellipse'
-import { Arc } from './Arc'
-import { Path } from './Path'
+import { Scene } from '../core/Scene'
+import { Polyline } from '../entity/Polyline'
+import { Circle } from '../entity/Circle'
+import { Rectangle } from '../entity/Rectangle'
+import { Ellipse } from '../entity/Ellipse'
+import { Arc } from '../entity/Arc'
+import { Path } from '../entity/Path'
 
 describe('HitTest', () => {
   it('picks a filled circle', () => {

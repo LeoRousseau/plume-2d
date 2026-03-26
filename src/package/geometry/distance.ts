@@ -1,6 +1,6 @@
 import { Vector2 } from '../math/Vector2'
-import type { Polyline } from '../core/Polyline'
-import type { Circle } from '../core/Circle'
+import type { Polyline } from '../entity/Polyline'
+import type { Circle } from '../entity/Circle'
 
 /** Returns the closest point on a line segment `[lineStart, lineEnd]` to `point`. */
 export function closestPointOnLine(point: Vector2, lineStart: Vector2, lineEnd: Vector2): Vector2 {

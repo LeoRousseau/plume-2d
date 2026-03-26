@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { Vector2 } from '../math/Vector2'
-import { Polyline } from '../core/Polyline'
-import { Circle } from '../core/Circle'
+import { Polyline } from '../entity/Polyline'
+import { Circle } from '../entity/Circle'
 import { snap } from './Snap'
 
 describe('snap', () => {

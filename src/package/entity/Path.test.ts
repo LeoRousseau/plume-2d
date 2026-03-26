@@ -31,7 +31,7 @@ describe('Path', () => {
       .moveTo(new Vector2(0, 0))
       .lineTo(new Vector2(3, 0))
       .lineTo(new Vector2(3, 4))
-    expect(p.length()).toBeCloseTo(7)
+    expect(p.perimeter()).toBeCloseTo(7)
   })
 
   it('getBoundingBox', () => {
@@ -87,6 +87,6 @@ describe('Path', () => {
       .quadraticTo(new Vector2(5, 10), new Vector2(10, 0))
       .cubicTo(new Vector2(15, 10), new Vector2(20, 10), new Vector2(25, 0))
     expect(p.segments).toHaveLength(3)
-    expect(p.length()).toBeGreaterThan(0)
+    expect(p.perimeter()).toBeGreaterThan(0)
   })
 })

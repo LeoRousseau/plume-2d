@@ -1,7 +1,7 @@
 import { Vector2 } from '../math/Vector2'
 import { BoundingBox } from '../math/BoundingBox'
 import type { IRenderer } from '../rendering/IRenderer'
-import { Shape } from './Shape'
+import { AShape } from './Shape'
 
 /** Horizontal text alignment. */
 export type TextAlign = 'left' | 'center' | 'right'
@@ -10,7 +10,7 @@ export type TextAlign = 'left' | 'center' | 'right'
 export type TextBaseline = 'top' | 'middle' | 'alphabetic' | 'bottom'
 
 /** A text label positioned at a point in 2D space. */
-export class Text extends Shape {
+export class Text extends AShape {
   /** The text string to display. */
   content: string
   /** Anchor position. */
@@ -67,5 +67,22 @@ export class Text extends Shape {
     else /* alphabetic */ y -= h * 0.8
 
     return new BoundingBox(new Vector2(x, y), new Vector2(x + w, y + h))
+  }
+
+  /** Returns `true` if the point lies inside the text bounding box. */
+  containsPoint(p: Vector2): boolean {
+    return this.getBoundingBox().containsPoint(p)
+  }
+
+  /** Area of the text bounding box. */
+  area(): number {
+    const bb = this.getBoundingBox()
+    return bb.width * bb.height
+  }
+
+  /** Perimeter of the text bounding box. */
+  perimeter(): number {
+    const bb = this.getBoundingBox()
+    return 2 * (bb.width + bb.height)
   }
 }

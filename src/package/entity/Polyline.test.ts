@@ -57,14 +57,14 @@ describe('Polyline', () => {
     expect(child.parent).toBe(parent)
   })
 
-  it('computes length for open polyline', () => {
+  it('computes perimeter for open polyline', () => {
     const p = new Polyline([new Vector2(0, 0), new Vector2(3, 0), new Vector2(3, 4)])
-    expect(p.length()).toBe(7)
+    expect(p.perimeter()).toBe(7)
   })
 
-  it('computes length for closed polyline', () => {
+  it('computes perimeter for closed polyline', () => {
     const p = new Polyline([new Vector2(0, 0), new Vector2(3, 0), new Vector2(3, 4)], true)
-    expect(p.length()).toBe(12)
+    expect(p.perimeter()).toBe(12)
   })
 
   it('segmentCount', () => {

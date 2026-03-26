@@ -26,9 +26,9 @@ describe('Circle', () => {
     expect(c.area()).toBeCloseTo(Math.PI * 25)
   })
 
-  it('computes circumference', () => {
+  it('computes perimeter', () => {
     const c = new Circle(new Vector2(), 3)
-    expect(c.circumference()).toBeCloseTo(2 * Math.PI * 3)
+    expect(c.perimeter()).toBeCloseTo(2 * Math.PI * 3)
   })
 
   it('containsPoint', () => {

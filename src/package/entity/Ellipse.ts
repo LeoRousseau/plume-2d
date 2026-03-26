@@ -1,10 +1,10 @@
 import { Vector2 } from '../math/Vector2'
 import { BoundingBox } from '../math/BoundingBox'
 import type { IRenderer } from '../rendering/IRenderer'
-import { Shape } from './Shape'
+import { AShape } from './Shape'
 
 /** An axis-aligned ellipse defined by center and two radii. */
-export class Ellipse extends Shape {
+export class Ellipse extends AShape {
   center: Vector2
   /** Horizontal radius. */
   rx: number

@@ -15,9 +15,9 @@ const mockRenderer: IRenderer = {
 }
 
 describe('Arc', () => {
-  it('computes arcLength', () => {
+  it('computes perimeter', () => {
     const a = new Arc(new Vector2(), 10, 0, Math.PI)
-    expect(a.arcLength()).toBeCloseTo(10 * Math.PI)
+    expect(a.perimeter()).toBeCloseTo(10 * Math.PI)
   })
 
   it('startPoint and endPoint', () => {

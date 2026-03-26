@@ -1,6 +1,7 @@
 import { Node } from '../core/Node'
 import type { IRenderer } from '../rendering/IRenderer'
 import type { BoundingBox } from '../math/BoundingBox'
+import type { Vector2 } from '../math/Vector2'
 import type { StrokeStyle } from './StrokeStyle'
 import type { FillStyle } from './FillStyle'
 import { defaultStroke } from './StrokeStyle'
@@ -13,7 +14,7 @@ import { defaultFill } from './FillStyle'
  * plus the ability to compute their bounding box and draw themselves
  * through a renderer.
  */
-export abstract class Shape extends Node {
+export abstract class AShape extends Node {
   /** Stroke styling (color, width, dash pattern, etc.). */
   stroke: StrokeStyle
   /** Fill styling (color, opacity). */
@@ -29,4 +30,10 @@ export abstract class Shape extends Node {
   abstract getBoundingBox(): BoundingBox
   /** Draws this shape using the given renderer. */
   abstract draw(renderer: IRenderer): void
+  /** Returns `true` if the point lies inside (or on) this shape. */
+  abstract containsPoint(p: Vector2): boolean
+  /** Returns the area of this shape. */
+  abstract area(): number
+  /** Returns the perimeter (boundary length) of this shape. */
+  abstract perimeter(): number
 }

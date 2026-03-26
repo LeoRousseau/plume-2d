@@ -1,10 +1,10 @@
 import { Vector2 } from '../math/Vector2'
 import { BoundingBox } from '../math/BoundingBox'
 import type { IRenderer } from '../rendering/IRenderer'
-import { Shape } from './Shape'
+import { AShape } from './Shape'
 
 /** A circular arc defined by center, radius, start angle and end angle (in radians). */
-export class Arc extends Shape {
+export class Arc extends AShape {
   center: Vector2
   radius: number
   /** Start angle in radians. */
@@ -43,11 +43,18 @@ export class Arc extends Shape {
     return BoundingBox.fromPoints(points)
   }
 
-  /** Arc length: `radius × sweep`. */
-  arcLength(): number {
+  /** Perimeter (arc length): `radius × sweep`. */
+  perimeter(): number {
     let sweep = this.endAngle - this.startAngle
     if (sweep < 0) sweep += Math.PI * 2
     return this.radius * sweep
+  }
+
+  /** Area of the circular sector defined by this arc. */
+  area(): number {
+    let sweep = this.endAngle - this.startAngle
+    if (sweep < 0) sweep += Math.PI * 2
+    return 0.5 * this.radius * this.radius * sweep
   }
 
   /** Point at the start of the arc. */

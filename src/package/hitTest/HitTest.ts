@@ -1,18 +1,18 @@
 import { Vector2 } from '../math/Vector2'
-import type { Node } from './Node'
-import { Shape } from './Shape'
-import { Polyline } from './Polyline'
-import { Circle } from './Circle'
-import { Rectangle } from './Rectangle'
-import { Ellipse } from './Ellipse'
-import { Arc } from './Arc'
-import { Path } from './Path'
-import { Text } from './Text'
+import type { Node } from '../core/Node'
+import { AShape } from '../entity/Shape'
+import { Polyline } from '../entity/Polyline'
+import { Circle } from '../entity/Circle'
+import { Rectangle } from '../entity/Rectangle'
+import { Ellipse } from '../entity/Ellipse'
+import { Arc } from '../entity/Arc'
+import { Path } from '../entity/Path'
+import { Text } from '../entity/Text'
 
 /** Result returned by {@link hitTest} when a shape is hit. */
 export interface HitTestResult {
   /** The shape that was hit. */
-  shape: Shape
+  shape: AShape
   /** The test point in the shape's local coordinate space. */
   point: Vector2
 }
@@ -32,7 +32,7 @@ export function hitTest(node: Node, worldPoint: Vector2, tolerance: number = 2):
     if (result) return result
   }
 
-  if (!(node instanceof Shape)) return null
+  if (!(node instanceof AShape)) return null
 
   const localPoint = node.transform.worldMatrix.invert().transformPoint(worldPoint)
 
@@ -43,7 +43,7 @@ export function hitTest(node: Node, worldPoint: Vector2, tolerance: number = 2):
   return null
 }
 
-function testShape(shape: Shape, p: Vector2, tolerance: number): boolean {
+function testShape(shape: AShape, p: Vector2, tolerance: number): boolean {
   const bb = shape.getBoundingBox().pad(tolerance)
   if (!bb.containsPoint(p)) return false
 

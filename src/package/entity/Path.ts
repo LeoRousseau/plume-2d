@@ -1,7 +1,7 @@
 import { Vector2 } from '../math/Vector2'
 import { BoundingBox } from '../math/BoundingBox'
 import type { IRenderer } from '../rendering/IRenderer'
-import { Shape } from './Shape'
+import { AShape } from './Shape'
 import type { PathSegment } from './PathSegment'
 
 /**
@@ -12,7 +12,7 @@ import type { PathSegment } from './PathSegment'
  * new Path().moveTo(a).lineTo(b).cubicTo(c1, c2, d).close()
  * ```
  */
-export class Path extends Shape {
+export class Path extends AShape {
   segments: PathSegment[]
 
   constructor(segments: PathSegment[] = []) {
@@ -45,7 +45,7 @@ export class Path extends Shape {
   }
 
   /** Total path length (curves are approximated by subdivision). */
-  length(): number {
+  perimeter(): number {
     let total = 0
     let current = new Vector2()
     for (const seg of this.segments) {
@@ -68,6 +68,23 @@ export class Path extends Shape {
       }
     }
     return total
+  }
+
+  /** Area enclosed by the path (only meaningful for closed paths). Uses the shoelace formula on the linearized path. */
+  area(): number {
+    const points = this.toPolylinePoints()
+    if (points.length < 3) return 0
+    const last = this.segments[this.segments.length - 1]
+    if (!last || last.type !== 'close') return 0
+
+    let sum = 0
+    const n = points.length
+    for (let i = 0; i < n; i++) {
+      const a = points[i]
+      const b = points[(i + 1) % n]
+      sum += a.x * b.y - b.x * a.y
+    }
+    return Math.abs(sum) / 2
   }
 
   /**

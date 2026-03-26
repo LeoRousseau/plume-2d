@@ -1,16 +1,16 @@
 import { Node } from '../core/Node'
 import type { Scene } from '../core/Scene'
 import type { View } from '../rendering/View'
-import { Shape } from '../core/Shape'
-import type { Polyline } from '../core/Polyline'
-import type { Circle } from '../core/Circle'
-import type { Rectangle } from '../core/Rectangle'
-import type { Ellipse } from '../core/Ellipse'
-import type { Arc } from '../core/Arc'
-import type { Path } from '../core/Path'
-import type { Text } from '../core/Text'
-import type { StrokeStyle } from '../core/StrokeStyle'
-import type { FillStyle } from '../core/FillStyle'
+import { AShape } from '../entity/Shape'
+import type { Polyline } from '../entity/Polyline'
+import type { Circle } from '../entity/Circle'
+import type { Rectangle } from '../entity/Rectangle'
+import type { Ellipse } from '../entity/Ellipse'
+import type { Arc } from '../entity/Arc'
+import type { Path } from '../entity/Path'
+import type { Text } from '../entity/Text'
+import type { StrokeStyle } from '../entity/StrokeStyle'
+import type { FillStyle } from '../entity/FillStyle'
 import type { IRenderer } from '../rendering/IRenderer'
 
 export class SVGRenderer implements IRenderer {
@@ -193,7 +193,7 @@ export class SVGRenderer implements IRenderer {
       `translate(${t.position.x},${t.position.y}) rotate(${(t.rotation * 180) / Math.PI}) scale(${t.scale.x},${t.scale.y})`,
     )
 
-    if (node instanceof Shape) {
+    if (node instanceof AShape) {
       node.draw(this)
     }
 

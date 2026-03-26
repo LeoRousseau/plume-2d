@@ -1,13 +1,13 @@
 import { Vector2 } from '../math/Vector2'
 import { BoundingBox } from '../math/BoundingBox'
 import type { IRenderer } from '../rendering/IRenderer'
-import { Shape } from './Shape'
+import { AShape } from './Shape'
 
 /**
  * A shape defined by an ordered list of 2D points.
  * Can be open (polyline) or closed (polygon).
  */
-export class Polyline extends Shape {
+export class Polyline extends AShape {
   points: Vector2[]
   /** If `true`, the last point connects back to the first. */
   isClosed: boolean
@@ -27,7 +27,7 @@ export class Polyline extends Shape {
   }
 
   /** Total length of all segments (including the closing segment if closed). */
-  length(): number {
+  perimeter(): number {
     let total = 0
     for (let i = 1; i < this.points.length; i++) {
       total += this.points[i].distanceTo(this.points[i - 1])

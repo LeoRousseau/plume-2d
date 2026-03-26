@@ -1,7 +1,7 @@
 import { Node } from './Node'
 import { Vector2 } from '../math/Vector2'
-import { hitTest } from './HitTest'
-import type { HitTestResult } from './HitTest'
+import { hitTest } from '../hitTest/HitTest'
+import type { HitTestResult } from '../hitTest/HitTest'
 
 /** Top-level container that holds the scene graph. */
 export class Scene {
