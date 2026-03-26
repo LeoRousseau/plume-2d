@@ -7,6 +7,7 @@ import { Rectangle } from '../entity/Rectangle'
 import { Ellipse } from '../entity/Ellipse'
 import { Arc } from '../entity/Arc'
 import { Path } from '../entity/Path'
+import { pick } from './HitTest'
 
 describe('HitTest', () => {
   it('picks a filled circle', () => {
@@ -15,7 +16,7 @@ describe('HitTest', () => {
     c.fill = { color: '#f00' }
     scene.root.addChild(c)
 
-    const hit = scene.pick(new Vector2(50, 50))
+    const hit = pick(scene, new Vector2(50, 50))
     expect(hit).not.toBeNull()
     expect(hit!.shape).toBe(c)
   })
@@ -27,12 +28,12 @@ describe('HitTest', () => {
     scene.root.addChild(c)
 
     // On the edge
-    const hit = scene.pick(new Vector2(70, 50), 2)
+    const hit = pick(scene, new Vector2(70, 50), 2)
     expect(hit).not.toBeNull()
     expect(hit!.shape).toBe(c)
 
     // Far from edge
-    const miss = scene.pick(new Vector2(50, 50), 2)
+    const miss = pick(scene, new Vector2(50, 50), 2)
     expect(miss).toBeNull()
   })
 
@@ -42,8 +43,8 @@ describe('HitTest', () => {
     r.fill = { color: '#0f0' }
     scene.root.addChild(r)
 
-    expect(scene.pick(new Vector2(30, 25))?.shape).toBe(r)
-    expect(scene.pick(new Vector2(100, 100))).toBeNull()
+    expect(pick(scene, new Vector2(30, 25))?.shape).toBe(r)
+    expect(pick(scene, new Vector2(100, 100))).toBeNull()
   })
 
   it('picks a stroked rectangle by edge', () => {
@@ -53,9 +54,9 @@ describe('HitTest', () => {
     scene.root.addChild(r)
 
     // On top edge
-    expect(scene.pick(new Vector2(30, 10), 2)?.shape).toBe(r)
+    expect(pick(scene, new Vector2(30, 10), 2)?.shape).toBe(r)
     // Center (not filled)
-    expect(scene.pick(new Vector2(30, 25), 2)).toBeNull()
+    expect(pick(scene, new Vector2(30, 25), 2)).toBeNull()
   })
 
   it('picks a closed polyline', () => {
@@ -67,8 +68,8 @@ describe('HitTest', () => {
     p.fill = { color: '#00f' }
     scene.root.addChild(p)
 
-    expect(scene.pick(new Vector2(10, 10))?.shape).toBe(p)
-    expect(scene.pick(new Vector2(50, 50))).toBeNull()
+    expect(pick(scene, new Vector2(10, 10))?.shape).toBe(p)
+    expect(pick(scene, new Vector2(50, 50))).toBeNull()
   })
 
   it('picks an open polyline by proximity', () => {
@@ -76,8 +77,8 @@ describe('HitTest', () => {
     const p = new Polyline([new Vector2(0, 0), new Vector2(100, 0)])
     scene.root.addChild(p)
 
-    expect(scene.pick(new Vector2(50, 1), 2)?.shape).toBe(p)
-    expect(scene.pick(new Vector2(50, 10), 2)).toBeNull()
+    expect(pick(scene, new Vector2(50, 1), 2)?.shape).toBe(p)
+    expect(pick(scene, new Vector2(50, 10), 2)).toBeNull()
   })
 
   it('picks a filled ellipse', () => {
@@ -86,8 +87,8 @@ describe('HitTest', () => {
     e.fill = { color: '#ff0' }
     scene.root.addChild(e)
 
-    expect(scene.pick(new Vector2(50, 50))?.shape).toBe(e)
-    expect(scene.pick(new Vector2(100, 100))).toBeNull()
+    expect(pick(scene, new Vector2(50, 50))?.shape).toBe(e)
+    expect(pick(scene, new Vector2(100, 100))).toBeNull()
   })
 
   it('picks an arc by proximity', () => {
@@ -96,9 +97,9 @@ describe('HitTest', () => {
     scene.root.addChild(a)
 
     // Point on the arc at angle 0
-    expect(scene.pick(new Vector2(80, 50), 2)?.shape).toBe(a)
+    expect(pick(scene, new Vector2(80, 50), 2)?.shape).toBe(a)
     // Far away
-    expect(scene.pick(new Vector2(0, 0), 2)).toBeNull()
+    expect(pick(scene, new Vector2(0, 0), 2)).toBeNull()
   })
 
   it('picks a closed path', () => {
@@ -112,8 +113,8 @@ describe('HitTest', () => {
     p.fill = { color: '#f0f' }
     scene.root.addChild(p)
 
-    expect(scene.pick(new Vector2(10, 10))?.shape).toBe(p)
-    expect(scene.pick(new Vector2(50, 50))).toBeNull()
+    expect(pick(scene, new Vector2(10, 10))?.shape).toBe(p)
+    expect(pick(scene, new Vector2(50, 50))).toBeNull()
   })
 
   it('returns top-most shape when overlapping', () => {
@@ -125,6 +126,6 @@ describe('HitTest', () => {
     scene.root.addChild(c1)
     scene.root.addChild(c2) // c2 is on top
 
-    expect(scene.pick(new Vector2(50, 50))?.shape).toBe(c2)
+    expect(pick(scene, new Vector2(50, 50))?.shape).toBe(c2)
   })
 })

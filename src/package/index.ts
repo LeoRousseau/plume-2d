@@ -23,7 +23,7 @@ export type { StrokeStyle } from './entity/StrokeStyle'
 export type { FillStyle } from './entity/FillStyle'
 
 // Hit Testing
-export { hitTest } from './hitTest/HitTest'
+export { hitTest, pick } from './hitTest/HitTest'
 export type { HitTestResult } from './hitTest/HitTest'
 
 // Rendering
@@ -35,7 +35,7 @@ export { Canvas2DRenderer } from './renderer/Canvas2DRenderer'
 export { SVGRenderer } from './renderer/SVGRenderer'
 
 // Geometry utilities
-export { distancePointToLine, distancePointToPolyline, distancePointToCircle, closestPointOnLine, closestPointOnPolyline } from './geometry/distance'
+export { distancePointToLine, distancePointToPolyline, distancePointToCircle, distancePointToSegment, distancePointToPolylineEdge, distancePointToRectEdge, distancePointToPathEdge, closestPointOnLine, closestPointOnPolyline } from './geometry/distance'
 export { intersectLineLine, intersectLineCircle, intersectCircleCircle } from './geometry/intersect'
 
 // Snapping

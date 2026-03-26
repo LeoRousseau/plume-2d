@@ -2,6 +2,7 @@ import { describe, it, expect, vi } from 'vitest'
 import { Text } from './Text'
 import { Vector2 } from '../math/Vector2'
 import { Scene } from '../core/Scene'
+import { pick } from '../hitTest/HitTest'
 import type { IRenderer } from '../rendering/IRenderer'
 
 const mockRenderer: IRenderer = {
@@ -73,15 +74,15 @@ describe('Text', () => {
     expect(bb.max.x).toBeCloseTo(100)
   })
 
-  it('is hit-testable via Scene.pick', () => {
+  it('is hit-testable via pick', () => {
     const scene = new Scene()
     const t = new Text('Hello', new Vector2(10, 50), 20)
     t.textAlign = 'left'
     t.textBaseline = 'top'
     scene.root.addChild(t)
 
-    expect(scene.pick(new Vector2(20, 60))).not.toBeNull()
-    expect(scene.pick(new Vector2(20, 60))!.shape).toBe(t)
-    expect(scene.pick(new Vector2(500, 500))).toBeNull()
+    expect(pick(scene, new Vector2(20, 60))).not.toBeNull()
+    expect(pick(scene, new Vector2(20, 60))!.shape).toBe(t)
+    expect(pick(scene, new Vector2(500, 500))).toBeNull()
   })
 })

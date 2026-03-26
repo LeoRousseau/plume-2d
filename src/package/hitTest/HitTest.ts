@@ -1,5 +1,6 @@
 import { Vector2 } from '../math/Vector2'
 import type { Node } from '../core/Node'
+import type { Scene } from '../core/Scene'
 import { AShape } from '../entity/Shape'
 import { Polyline } from '../entity/Polyline'
 import { Circle } from '../entity/Circle'
@@ -8,6 +9,7 @@ import { Ellipse } from '../entity/Ellipse'
 import { Arc } from '../entity/Arc'
 import { Path } from '../entity/Path'
 import { Text } from '../entity/Text'
+import { distancePointToPolylineEdge, distancePointToRectEdge, distancePointToPathEdge } from '../geometry/distance'
 
 /** Result returned by {@link hitTest} when a shape is hit. */
 export interface HitTestResult {
@@ -15,6 +17,14 @@ export interface HitTestResult {
   shape: AShape
   /** The test point in the shape's local coordinate space. */
   point: Vector2
+}
+
+/**
+ * Hit-tests a scene at the given world-space point.
+ * Shorthand for `hitTest(scene.root, worldPoint, tolerance)`.
+ */
+export function pick(scene: Scene, worldPoint: Vector2, tolerance: number = 2): HitTestResult | null {
+  return hitTest(scene.root, worldPoint, tolerance)
 }
 
 /**
@@ -51,7 +61,7 @@ function testShape(shape: AShape, p: Vector2, tolerance: number): boolean {
     if (shape.isClosed && shape.fill.color !== 'transparent') {
       return shape.containsPoint(p)
     }
-    return distanceToPolylineEdge(shape, p) <= tolerance
+    return distancePointToPolylineEdge(p, shape) <= tolerance
   }
 
   if (shape instanceof Circle) {
@@ -65,7 +75,7 @@ function testShape(shape: AShape, p: Vector2, tolerance: number): boolean {
     if (shape.fill.color !== 'transparent') {
       return shape.containsPoint(p)
     }
-    return distanceToRectEdge(shape, p) <= tolerance
+    return distancePointToRectEdge(p, shape) <= tolerance
   }
 
   if (shape instanceof Ellipse) {
@@ -86,7 +96,7 @@ function testShape(shape: AShape, p: Vector2, tolerance: number): boolean {
     if (shape.fill.color !== 'transparent' && shape.containsPoint(p)) {
       return true
     }
-    return distanceToPathEdge(shape, p) <= tolerance
+    return distancePointToPathEdge(p, shape) <= tolerance
   }
 
   if (shape instanceof Text) {
@@ -94,50 +104,4 @@ function testShape(shape: AShape, p: Vector2, tolerance: number): boolean {
   }
 
   return false
-}
-
-function distanceToPolylineEdge(polyline: Polyline, p: Vector2): number {
-  let minDist = Infinity
-  const count = polyline.segmentCount()
-  for (let i = 0; i < count; i++) {
-    const [a, b] = polyline.segmentAt(i)
-    const d = distancePointToSegment(p, a, b)
-    if (d < minDist) minDist = d
-  }
-  return minDist
-}
-
-function distanceToRectEdge(rect: Rectangle, p: Vector2): number {
-  const { x, y } = rect.origin
-  const corners = [
-    new Vector2(x, y),
-    new Vector2(x + rect.width, y),
-    new Vector2(x + rect.width, y + rect.height),
-    new Vector2(x, y + rect.height),
-  ]
-  let minDist = Infinity
-  for (let i = 0; i < 4; i++) {
-    const d = distancePointToSegment(p, corners[i], corners[(i + 1) % 4])
-    if (d < minDist) minDist = d
-  }
-  return minDist
-}
-
-function distanceToPathEdge(path: Path, p: Vector2): number {
-  const pts = path.toPolylinePoints(8)
-  let minDist = Infinity
-  for (let i = 0; i < pts.length - 1; i++) {
-    const d = distancePointToSegment(p, pts[i], pts[i + 1])
-    if (d < minDist) minDist = d
-  }
-  return minDist
-}
-
-function distancePointToSegment(p: Vector2, a: Vector2, b: Vector2): number {
-  const ab = b.sub(a)
-  const lengthSq = ab.dot(ab)
-  if (lengthSq === 0) return p.distanceTo(a)
-  const t = Math.max(0, Math.min(1, p.sub(a).dot(ab) / lengthSq))
-  const proj = a.add(ab.scale(t))
-  return p.distanceTo(proj)
 }
