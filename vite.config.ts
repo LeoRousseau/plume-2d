@@ -7,4 +7,11 @@ export default defineConfig({
       '@plume': resolve(__dirname, 'src/package'),
     },
   },
+  build: {
+    lib: {
+      entry: resolve(__dirname, 'src/package/index.ts'),
+      formats: ['es'],
+      fileName: 'plume-2d',
+    },
+  },
 })

@@ -3,6 +3,13 @@ import type { Scene } from '../core/Scene'
 import type { View } from '../rendering/View'
 import { Shape } from '../core/Shape'
 import type { Polyline } from '../core/Polyline'
+import type { Circle } from '../core/Circle'
+import type { Rectangle } from '../core/Rectangle'
+import type { Ellipse } from '../core/Ellipse'
+import type { Arc } from '../core/Arc'
+import type { Path } from '../core/Path'
+import type { StrokeStyle } from '../core/StrokeStyle'
+import type { FillStyle } from '../core/FillStyle'
 import type { IRenderer } from '../rendering/IRenderer'
 
 export class SVGRenderer implements IRenderer {
@@ -27,7 +34,6 @@ export class SVGRenderer implements IRenderer {
     this.elements = []
     this.transformStack = []
 
-    // View transform: center + zoom (same logic as Canvas2DRenderer)
     const offsetX = this.width / 2 - view.center.x * view.zoom
     const offsetY = this.height / 2 - view.center.y * view.zoom
     this.transformStack.push(`translate(${offsetX},${offsetY}) scale(${view.zoom})`)
@@ -49,19 +55,110 @@ export class SVGRenderer implements IRenderer {
     const pts = polyline.points.map((p) => `${p.x},${p.y}`).join(' ')
     const tag = polyline.isClosed ? 'polygon' : 'polyline'
     const transform = this.transformStack.join(' ')
-
-    const attrs: string[] = [
-      `points="${pts}"`,
-      `stroke="${polyline.strokeColor}"`,
-      `stroke-width="${polyline.strokeWidth}"`,
-      `fill="${polyline.fillColor}"`,
-    ]
+    const style = this.buildStyleAttrs(polyline.stroke, polyline.fill)
 
     this.elements.push(
       `  <g transform="${transform}">`,
-      `    <${tag} ${attrs.join(' ')} />`,
+      `    <${tag} points="${pts}" ${style} />`,
       `  </g>`,
     )
+  }
+
+  drawCircle(circle: Circle): void {
+    const transform = this.transformStack.join(' ')
+    const style = this.buildStyleAttrs(circle.stroke, circle.fill)
+
+    this.elements.push(
+      `  <g transform="${transform}">`,
+      `    <circle cx="${circle.center.x}" cy="${circle.center.y}" r="${circle.radius}" ${style} />`,
+      `  </g>`,
+    )
+  }
+
+  drawRectangle(rect: Rectangle): void {
+    const transform = this.transformStack.join(' ')
+    const style = this.buildStyleAttrs(rect.stroke, rect.fill)
+
+    this.elements.push(
+      `  <g transform="${transform}">`,
+      `    <rect x="${rect.origin.x}" y="${rect.origin.y}" width="${rect.width}" height="${rect.height}" ${style} />`,
+      `  </g>`,
+    )
+  }
+
+  drawEllipse(ellipse: Ellipse): void {
+    const transform = this.transformStack.join(' ')
+    const style = this.buildStyleAttrs(ellipse.stroke, ellipse.fill)
+
+    this.elements.push(
+      `  <g transform="${transform}">`,
+      `    <ellipse cx="${ellipse.center.x}" cy="${ellipse.center.y}" rx="${ellipse.rx}" ry="${ellipse.ry}" ${style} />`,
+      `  </g>`,
+    )
+  }
+
+  drawArc(arc: Arc): void {
+    const transform = this.transformStack.join(' ')
+    const style = this.buildStyleAttrs(arc.stroke, arc.fill)
+    const startX = arc.center.x + arc.radius * Math.cos(arc.startAngle)
+    const startY = arc.center.y + arc.radius * Math.sin(arc.startAngle)
+    const endX = arc.center.x + arc.radius * Math.cos(arc.endAngle)
+    const endY = arc.center.y + arc.radius * Math.sin(arc.endAngle)
+    let sweep = arc.endAngle - arc.startAngle
+    if (sweep < 0) sweep += Math.PI * 2
+    const largeArc = sweep > Math.PI ? 1 : 0
+
+    this.elements.push(
+      `  <g transform="${transform}">`,
+      `    <path d="M ${startX} ${startY} A ${arc.radius} ${arc.radius} 0 ${largeArc} 1 ${endX} ${endY}" ${style} />`,
+      `  </g>`,
+    )
+  }
+
+  drawPath(path: Path): void {
+    const transform = this.transformStack.join(' ')
+    const style = this.buildStyleAttrs(path.stroke, path.fill)
+    let d = ''
+    for (const seg of path.segments) {
+      switch (seg.type) {
+        case 'moveTo':
+          d += `M ${seg.point.x} ${seg.point.y} `
+          break
+        case 'lineTo':
+          d += `L ${seg.point.x} ${seg.point.y} `
+          break
+        case 'quadraticTo':
+          d += `Q ${seg.control.x} ${seg.control.y} ${seg.point.x} ${seg.point.y} `
+          break
+        case 'cubicTo':
+          d += `C ${seg.control1.x} ${seg.control1.y} ${seg.control2.x} ${seg.control2.y} ${seg.point.x} ${seg.point.y} `
+          break
+        case 'close':
+          d += 'Z '
+          break
+      }
+    }
+
+    this.elements.push(
+      `  <g transform="${transform}">`,
+      `    <path d="${d.trim()}" ${style} />`,
+      `  </g>`,
+    )
+  }
+
+  private buildStyleAttrs(stroke: StrokeStyle, fill: FillStyle): string {
+    const attrs: string[] = [
+      `stroke="${stroke.color}"`,
+      `stroke-width="${stroke.width}"`,
+      `fill="${fill.color}"`,
+    ]
+    if (stroke.dashArray) attrs.push(`stroke-dasharray="${stroke.dashArray.join(',')}"`)
+    if (stroke.dashOffset !== undefined) attrs.push(`stroke-dashoffset="${stroke.dashOffset}"`)
+    if (stroke.lineCap) attrs.push(`stroke-linecap="${stroke.lineCap}"`)
+    if (stroke.lineJoin) attrs.push(`stroke-linejoin="${stroke.lineJoin}"`)
+    if (stroke.opacity !== undefined) attrs.push(`stroke-opacity="${stroke.opacity}"`)
+    if (fill.opacity !== undefined) attrs.push(`fill-opacity="${fill.opacity}"`)
+    return attrs.join(' ')
   }
 
   private renderNode(node: Node): void {

@@ -3,6 +3,13 @@ import type { Scene } from '../core/Scene'
 import type { View } from '../rendering/View'
 import { Shape } from '../core/Shape'
 import type { Polyline } from '../core/Polyline'
+import type { Circle } from '../core/Circle'
+import type { Rectangle } from '../core/Rectangle'
+import type { Ellipse } from '../core/Ellipse'
+import type { Arc } from '../core/Arc'
+import type { Path } from '../core/Path'
+import type { StrokeStyle } from '../core/StrokeStyle'
+import type { FillStyle } from '../core/FillStyle'
 import type { IRenderer } from '../rendering/IRenderer'
 
 export class Canvas2DRenderer implements IRenderer {
@@ -44,15 +51,84 @@ export class Canvas2DRenderer implements IRenderer {
       this.ctx.closePath()
     }
 
-    if (polyline.fillColor !== 'transparent') {
-      this.ctx.fillStyle = polyline.fillColor
-      this.ctx.fill()
-    }
+    this.applyFill(polyline.fill)
+    this.applyStroke(polyline.stroke)
+  }
 
-    if (polyline.strokeWidth > 0) {
-      this.ctx.strokeStyle = polyline.strokeColor
-      this.ctx.lineWidth = polyline.strokeWidth
+  drawCircle(circle: Circle): void {
+    this.ctx.beginPath()
+    this.ctx.arc(circle.center.x, circle.center.y, circle.radius, 0, Math.PI * 2)
+    this.applyFill(circle.fill)
+    this.applyStroke(circle.stroke)
+  }
+
+  drawRectangle(rect: Rectangle): void {
+    this.ctx.beginPath()
+    this.ctx.rect(rect.origin.x, rect.origin.y, rect.width, rect.height)
+    this.applyFill(rect.fill)
+    this.applyStroke(rect.stroke)
+  }
+
+  drawEllipse(ellipse: Ellipse): void {
+    this.ctx.beginPath()
+    this.ctx.ellipse(ellipse.center.x, ellipse.center.y, ellipse.rx, ellipse.ry, 0, 0, Math.PI * 2)
+    this.applyFill(ellipse.fill)
+    this.applyStroke(ellipse.stroke)
+  }
+
+  drawArc(arc: Arc): void {
+    this.ctx.beginPath()
+    this.ctx.arc(arc.center.x, arc.center.y, arc.radius, arc.startAngle, arc.endAngle)
+    this.applyStroke(arc.stroke)
+  }
+
+  drawPath(path: Path): void {
+    this.ctx.beginPath()
+    for (const seg of path.segments) {
+      switch (seg.type) {
+        case 'moveTo':
+          this.ctx.moveTo(seg.point.x, seg.point.y)
+          break
+        case 'lineTo':
+          this.ctx.lineTo(seg.point.x, seg.point.y)
+          break
+        case 'quadraticTo':
+          this.ctx.quadraticCurveTo(seg.control.x, seg.control.y, seg.point.x, seg.point.y)
+          break
+        case 'cubicTo':
+          this.ctx.bezierCurveTo(seg.control1.x, seg.control1.y, seg.control2.x, seg.control2.y, seg.point.x, seg.point.y)
+          break
+        case 'close':
+          this.ctx.closePath()
+          break
+      }
+    }
+    this.applyFill(path.fill)
+    this.applyStroke(path.stroke)
+  }
+
+  private applyFill(fill: FillStyle): void {
+    if (fill.color !== 'transparent') {
+      this.ctx.save()
+      if (fill.opacity !== undefined) this.ctx.globalAlpha = fill.opacity
+      this.ctx.fillStyle = fill.color
+      this.ctx.fill()
+      this.ctx.restore()
+    }
+  }
+
+  private applyStroke(stroke: StrokeStyle): void {
+    if (stroke.width > 0) {
+      this.ctx.save()
+      if (stroke.opacity !== undefined) this.ctx.globalAlpha = stroke.opacity
+      this.ctx.strokeStyle = stroke.color
+      this.ctx.lineWidth = stroke.width
+      if (stroke.dashArray) this.ctx.setLineDash(stroke.dashArray)
+      if (stroke.dashOffset !== undefined) this.ctx.lineDashOffset = stroke.dashOffset
+      if (stroke.lineCap) this.ctx.lineCap = stroke.lineCap
+      if (stroke.lineJoin) this.ctx.lineJoin = stroke.lineJoin
       this.ctx.stroke()
+      this.ctx.restore()
     }
   }
 

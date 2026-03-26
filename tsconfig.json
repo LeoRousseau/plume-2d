@@ -16,5 +16,5 @@
       "@plume/*": ["src/package/*"]
     }
   },
-  "include": ["src"]
+  "include": ["src", "demo"]
 }

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Plume 2D</title>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body { background: #1a1a2e; color: #eee; font-family: system-ui, sans-serif; display: flex; height: 100vh; }
+      canvas { border: 1px solid #333; cursor: crosshair; display: block; }
+      #sidebar {
+        width: 220px;
+        background: #16213e;
+        padding: 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        overflow-y: auto;
+        flex-shrink: 0;
+      }
+      #sidebar h3 {
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: #888;
+        margin-top: 8px;
+      }
+      #sidebar h3:first-child { margin-top: 0; }
+      #sidebar button {
+        padding: 7px 10px;
+        background: #0f3460;
+        color: #eee;
+        border: 1px solid #1a4a80;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 13px;
+        text-align: left;
+        transition: background 0.15s;
+      }
+      #sidebar button:hover { background: #1a4a80; }
+      #sidebar button.active { background: #e94560; border-color: #e94560; }
+      #sidebar button.danger { background: #533; border-color: #744; }
+      #sidebar button.danger:hover { background: #744; }
+      #canvas-wrap { flex: 1; display: flex; align-items: center; justify-content: center; }
+      #info {
+        position: fixed;
+        bottom: 12px;
+        right: 12px;
+        background: rgba(0,0,0,0.7);
+        padding: 8px 12px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-family: monospace;
+        max-width: 400px;
+        white-space: pre-wrap;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="sidebar">
+      <h3>Primitives</h3>
+      <button id="btn-circle">Circle</button>
+      <button id="btn-rect">Rectangle</button>
+      <button id="btn-ellipse">Ellipse</button>
+      <button id="btn-arc">Arc</button>
+      <button id="btn-path">Path (bezier)</button>
+      <button id="btn-polyline">Polyline (click)</button>
+
+      <h3>Styles</h3>
+      <button id="btn-dashed">Dashed stroke</button>
+      <button id="btn-thick">Thick + round caps</button>
+      <button id="btn-opacity">Semi-transparent</button>
+
+      <h3>Polyline tools</h3>
+      <button id="btn-simplify">Simplify (DP)</button>
+      <button id="btn-reverse">Reverse last</button>
+      <button id="btn-bbox">Show BoundingBoxes</button>
+      <button id="btn-centroid">Show centroids</button>
+
+      <h3>Geometry</h3>
+      <button id="btn-intersect">Line-Line intersect</button>
+      <button id="btn-line-circle">Line-Circle intersect</button>
+      <button id="btn-circle-circle">Circle-Circle intersect</button>
+      <button id="btn-distance">Distance to shape</button>
+
+      <h3>Snap</h3>
+      <button id="btn-snap">Toggle snap</button>
+
+      <h3>Scene</h3>
+      <button id="btn-clear" class="danger">Clear all</button>
+      <button id="btn-svg">Download SVG</button>
+    </div>
+    <div id="canvas-wrap">
+      <canvas id="plume-canvas"></canvas>
+    </div>
+    <div id="info"></div>
+    <script type="module" src="./main.ts"></script>
+  </body>
+</html>

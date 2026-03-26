@@ -1,11 +1,23 @@
 {
   "name": "plume-2d",
   "version": "1.0.0",
-  "private": true,
   "type": "module",
+  "main": "dist/plume-2d.js",
+  "module": "dist/plume-2d.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/plume-2d.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": false,
   "scripts": {
-    "dev": "vite",
-    "build": "tsc && vite build",
+    "dev": "vite --config demo/vite.config.ts",
+    "build": "vite build && tsc -p tsconfig.build.json",
     "preview": "vite preview",
     "test": "vitest",
     "test:run": "vitest run",
