@@ -1,5 +1,6 @@
 import { Vector2 } from '../math/Vector2'
 import { BoundingBox } from '../math/BoundingBox'
+import { TWO_PI, EPSILON } from '../math/constants'
 import type { IRenderer } from '../rendering/IRenderer'
 import { AShape } from './Shape'
 
@@ -46,14 +47,14 @@ export class Arc extends AShape {
   /** Perimeter (arc length): `radius × sweep`. */
   perimeter(): number {
     let sweep = this.endAngle - this.startAngle
-    if (sweep < 0) sweep += Math.PI * 2
+    if (sweep < 0) sweep += TWO_PI
     return this.radius * sweep
   }
 
   /** Area of the circular sector defined by this arc. */
   area(): number {
     let sweep = this.endAngle - this.startAngle
-    if (sweep < 0) sweep += Math.PI * 2
+    if (sweep < 0) sweep += TWO_PI
     return 0.5 * this.radius * this.radius * sweep
   }
 
@@ -92,10 +93,9 @@ export class Arc extends AShape {
   }
 
   private containsAngle(angle: number): boolean {
-    const TWO_PI = Math.PI * 2
     // If sweep covers a full circle or more, every angle is contained
     const sweep = Math.abs(this.endAngle - this.startAngle)
-    if (sweep >= TWO_PI - 1e-10) return true
+    if (sweep >= TWO_PI - EPSILON) return true
 
     const normalize = (a: number) => ((a % TWO_PI) + TWO_PI) % TWO_PI
     const start = normalize(this.startAngle)

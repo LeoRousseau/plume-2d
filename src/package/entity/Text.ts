@@ -1,5 +1,6 @@
 import { Vector2 } from '../math/Vector2'
 import { BoundingBox } from '../math/BoundingBox'
+import { TEXT_CHAR_WIDTH_RATIO, TEXT_ALPHABETIC_RATIO } from '../math/constants'
 import type { IRenderer } from '../rendering/IRenderer'
 import { AShape } from './Shape'
 
@@ -58,7 +59,7 @@ export class Text extends AShape {
    * For pixel-accurate bounds, use `CanvasRenderingContext2D.measureText()` externally.
    */
   getBoundingBox(): BoundingBox {
-    const charWidth = this.fontSize * 0.6
+    const charWidth = this.fontSize * TEXT_CHAR_WIDTH_RATIO
     const w = this.content.length * charWidth
     const h = this.fontSize
 
@@ -70,7 +71,7 @@ export class Text extends AShape {
     if (this.textBaseline === 'top') { /* y is already top */ }
     else if (this.textBaseline === 'middle') y -= h / 2
     else if (this.textBaseline === 'bottom') y -= h
-    else /* alphabetic */ y -= h * 0.8
+    else /* alphabetic */ y -= h * TEXT_ALPHABETIC_RATIO
 
     return new BoundingBox(new Vector2(x, y), new Vector2(x + w, y + h))
   }

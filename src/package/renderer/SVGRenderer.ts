@@ -1,6 +1,7 @@
 import { Node } from '../core/Node'
 import type { Scene } from '../core/Scene'
 import type { View } from '../rendering/View'
+import { TWO_PI } from '../math/constants'
 import { AShape } from '../entity/Shape'
 import type { Polyline } from '../entity/Polyline'
 import type { Circle } from '../entity/Circle'
@@ -106,7 +107,7 @@ export class SVGRenderer implements IRenderer {
     const endX = arc.center.x + arc.radius * Math.cos(arc.endAngle)
     const endY = arc.center.y + arc.radius * Math.sin(arc.endAngle)
     let sweep = arc.endAngle - arc.startAngle
-    if (sweep < 0) sweep += Math.PI * 2
+    if (sweep < 0) sweep += TWO_PI
     const largeArc = sweep > Math.PI ? 1 : 0
 
     this.elements.push(

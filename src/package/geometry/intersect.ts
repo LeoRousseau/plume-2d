@@ -1,5 +1,6 @@
 import { Vector2 } from '../math/Vector2'
 import type { BoundingBox } from '../math/BoundingBox'
+import { EPSILON } from '../math/constants'
 
 /**
  * Finds the intersection point of two line segments, or `null` if they don't intersect.
@@ -12,7 +13,7 @@ export function intersectLineLine(
   const d1 = a2.sub(a1)
   const d2 = b2.sub(b1)
   const cross = Vector2.cross(d1, d2)
-  if (Math.abs(cross) < 1e-10) return null
+  if (Math.abs(cross) < EPSILON) return null
 
   const d = b1.sub(a1)
   const t = Vector2.cross(d, d2) / cross
@@ -48,7 +49,7 @@ export function intersectLineCircle(
   const t2 = (-b + discriminant) / (2 * a)
 
   if (t1 >= 0 && t1 <= 1) results.push(lineStart.add(d.scale(t1)))
-  if (t2 >= 0 && t2 <= 1 && Math.abs(t2 - t1) > 1e-10) results.push(lineStart.add(d.scale(t2)))
+  if (t2 >= 0 && t2 <= 1 && Math.abs(t2 - t1) > EPSILON) results.push(lineStart.add(d.scale(t2)))
 
   return results
 }
@@ -70,7 +71,7 @@ export function intersectCircleCircle(
   const mid = c1.center.add(dir.scale(a))
   const perp = new Vector2(-dir.y, dir.x)
 
-  if (Math.abs(h) < 1e-10) return [mid]
+  if (Math.abs(h) < EPSILON) return [mid]
   return [mid.add(perp.scale(h)), mid.add(perp.scale(-h))]
 }
 

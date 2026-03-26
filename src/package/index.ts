@@ -2,6 +2,7 @@
 export { Vector2 } from './math/Vector2'
 export { Matrix } from './math/Matrix'
 export { BoundingBox } from './math/BoundingBox'
+export { TWO_PI, EPSILON, MATRIX_EPSILON, CURVE_SUBDIVISIONS, DEFAULT_HIT_TOLERANCE, TEXT_CHAR_WIDTH_RATIO, TEXT_ALPHABETIC_RATIO } from './math/constants'
 
 // Core
 export { Node } from './core/Node'

@@ -1,5 +1,6 @@
 import { Vector2 } from '../math/Vector2'
 import { BoundingBox } from '../math/BoundingBox'
+import { CURVE_SUBDIVISIONS } from '../math/constants'
 import type { IRenderer } from '../rendering/IRenderer'
 import { AShape } from './Shape'
 import type { PathSegment } from './PathSegment'
@@ -118,7 +119,7 @@ export class Path extends AShape {
    * Converts this path to an array of points by linearizing all curves.
    * @param steps - Number of subdivisions per curve segment (default 16).
    */
-  toPolylinePoints(steps = 16): Vector2[] {
+  toPolylinePoints(steps = CURVE_SUBDIVISIONS): Vector2[] {
     const points: Vector2[] = []
     let current = new Vector2()
     for (const seg of this.segments) {
@@ -188,7 +189,7 @@ export class Path extends AShape {
   }
 }
 
-function approximateCurveLength(p0: Vector2, p1: Vector2, p2: Vector2, steps = 16): number {
+function approximateCurveLength(p0: Vector2, p1: Vector2, p2: Vector2, steps = CURVE_SUBDIVISIONS): number {
   let total = 0
   let prev = p0
   for (let i = 1; i <= steps; i++) {
@@ -202,7 +203,7 @@ function approximateCurveLength(p0: Vector2, p1: Vector2, p2: Vector2, steps = 1
   return total
 }
 
-function approximateCubicLength(p0: Vector2, p1: Vector2, p2: Vector2, p3: Vector2, steps = 16): number {
+function approximateCubicLength(p0: Vector2, p1: Vector2, p2: Vector2, p3: Vector2, steps = CURVE_SUBDIVISIONS): number {
   let total = 0
   let prev = p0
   for (let i = 1; i <= steps; i++) {

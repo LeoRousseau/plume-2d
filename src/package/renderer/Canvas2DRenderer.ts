@@ -1,6 +1,7 @@
 import { Node } from '../core/Node'
 import type { Scene } from '../core/Scene'
 import type { View } from '../rendering/View'
+import { TWO_PI } from '../math/constants'
 import { AShape } from '../entity/Shape'
 import type { Polyline } from '../entity/Polyline'
 import type { Circle } from '../entity/Circle'
@@ -58,7 +59,7 @@ export class Canvas2DRenderer implements IRenderer {
 
   drawCircle(circle: Circle): void {
     this.ctx.beginPath()
-    this.ctx.arc(circle.center.x, circle.center.y, circle.radius, 0, Math.PI * 2)
+    this.ctx.arc(circle.center.x, circle.center.y, circle.radius, 0, TWO_PI)
     this.applyFill(circle.fill)
     this.applyStroke(circle.stroke)
   }
@@ -72,7 +73,7 @@ export class Canvas2DRenderer implements IRenderer {
 
   drawEllipse(ellipse: Ellipse): void {
     this.ctx.beginPath()
-    this.ctx.ellipse(ellipse.center.x, ellipse.center.y, ellipse.rx, ellipse.ry, 0, 0, Math.PI * 2)
+    this.ctx.ellipse(ellipse.center.x, ellipse.center.y, ellipse.rx, ellipse.ry, 0, 0, TWO_PI)
     this.applyFill(ellipse.fill)
     this.applyStroke(ellipse.stroke)
   }

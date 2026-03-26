@@ -1,4 +1,5 @@
 import { Vector2 } from './Vector2'
+import { MATRIX_EPSILON } from './constants'
 
 /**
  * 2D affine transform matrix (3x3) stored as 6 named fields.
@@ -78,7 +79,7 @@ export class Matrix {
    */
   invert(): Matrix | null {
     const det = this.determinant()
-    if (Math.abs(det) < 1e-12) return null
+    if (Math.abs(det) < MATRIX_EPSILON) return null
     const invDet = 1 / det
     return new Matrix(
       this.d * invDet,

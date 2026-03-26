@@ -1,4 +1,5 @@
 import { Vector2 } from '../math/Vector2'
+import { DEFAULT_HIT_TOLERANCE } from '../math/constants'
 import type { Node } from '../core/Node'
 import type { Scene } from '../core/Scene'
 import { AShape } from '../entity/Shape'
@@ -15,7 +16,7 @@ export interface HitTestResult {
  * Hit-tests a scene at the given world-space point.
  * Shorthand for `hitTest(scene.root, worldPoint, tolerance)`.
  */
-export function pick(scene: Scene, worldPoint: Vector2, tolerance: number = 2): HitTestResult | null {
+export function pick(scene: Scene, worldPoint: Vector2, tolerance: number = DEFAULT_HIT_TOLERANCE): HitTestResult | null {
   return hitTest(scene.root, worldPoint, tolerance)
 }
 
@@ -28,7 +29,7 @@ export function pick(scene: Scene, worldPoint: Vector2, tolerance: number = 2): 
  * @param tolerance  - Extra pixel tolerance for stroked (non-filled) shapes.
  * @returns The first hit result, or `null` if nothing was hit.
  */
-export function hitTest(node: Node, worldPoint: Vector2, tolerance: number = 2): HitTestResult | null {
+export function hitTest(node: Node, worldPoint: Vector2, tolerance: number = DEFAULT_HIT_TOLERANCE): HitTestResult | null {
   for (let i = node.children.length - 1; i >= 0; i--) {
     const result = hitTest(node.children[i], worldPoint, tolerance)
     if (result) return result
