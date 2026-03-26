@@ -47,6 +47,14 @@ const defaultOptions: Required<SnapOptions> = {
  * @param shapes  - Shapes to consider for point/edge/center snapping.
  * @param options - Snap configuration.
  * @returns The closest snap candidate within tolerance, or `null`.
+ *
+ * @example
+ * ```ts
+ * const result = snap(new Vector2(12, 18), shapes, { gridSize: 10, tolerance: 15 })
+ * if (result) {
+ *   console.log(result.type, result.point) // 'grid', Vector2(10, 20)
+ * }
+ * ```
  */
 export function snap(point: Vector2, shapes: AShape[], options: SnapOptions = {}): SnapResult | null {
   const opts = { ...defaultOptions, ...options }

@@ -4,7 +4,15 @@ import type { Circle } from '../entity/Circle'
 import type { Rectangle } from '../entity/Rectangle'
 import type { Path } from '../entity/Path'
 
-/** Returns the closest point on a line segment `[lineStart, lineEnd]` to `point`. */
+/**
+ * Returns the closest point on a line segment `[lineStart, lineEnd]` to `point`.
+ *
+ * @example
+ * ```ts
+ * const cp = closestPointOnLine(new Vector2(5, 5), new Vector2(0, 0), new Vector2(10, 0))
+ * // cp = Vector2(5, 0)
+ * ```
+ */
 export function closestPointOnLine(point: Vector2, lineStart: Vector2, lineEnd: Vector2): Vector2 {
   const ab = lineEnd.sub(lineStart)
   const lengthSq = ab.dot(ab)

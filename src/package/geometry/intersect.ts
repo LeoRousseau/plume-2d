@@ -5,6 +5,15 @@ import { EPSILON } from '../math/constants'
 /**
  * Finds the intersection point of two line segments, or `null` if they don't intersect.
  * Segments are `[a1, a2]` and `[b1, b2]`.
+ *
+ * @example
+ * ```ts
+ * const hit = intersectLineLine(
+ *   new Vector2(0, 0), new Vector2(10, 10),
+ *   new Vector2(10, 0), new Vector2(0, 10),
+ * )
+ * // hit = Vector2(5, 5)
+ * ```
  */
 export function intersectLineLine(
   a1: Vector2, a2: Vector2,

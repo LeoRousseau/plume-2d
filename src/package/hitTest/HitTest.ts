@@ -15,6 +15,14 @@ export interface HitTestResult {
 /**
  * Hit-tests a scene at the given world-space point.
  * Shorthand for `hitTest(scene.root, worldPoint, tolerance)`.
+ *
+ * @example
+ * ```ts
+ * const result = pick(scene, new Vector2(100, 100))
+ * if (result) {
+ *   console.log(result.shape, result.point)
+ * }
+ * ```
  */
 export function pick(scene: Scene, worldPoint: Vector2, tolerance: number = DEFAULT_HIT_TOLERANCE): HitTestResult | null {
   return hitTest(scene.root, worldPoint, tolerance)

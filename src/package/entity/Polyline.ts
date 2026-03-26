@@ -7,6 +7,15 @@ import { distancePointToPolylineEdge } from '../geometry/distance'
 /**
  * A shape defined by an ordered list of 2D points.
  * Can be open (polyline) or closed (polygon).
+ *
+ * @example
+ * ```ts
+ * const triangle = new Polyline([
+ *   new Vector2(0, 0), new Vector2(100, 0), new Vector2(50, 80),
+ * ], true)
+ * triangle.area()      // 4000
+ * triangle.perimeter()  // ~280
+ * ```
  */
 export class Polyline extends AShape {
   points: Vector2[]

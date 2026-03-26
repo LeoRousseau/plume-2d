@@ -1,4 +1,14 @@
-/** Immutable-style 2D vector with common math operations. */
+/**
+ * A 2D vector with x, y components.
+ *
+ * @example
+ * ```ts
+ * const a = new Vector2(3, 4)
+ * a.length()           // 5
+ * a.normalize()        // Vector2(0.6, 0.8)
+ * a.add(new Vector2(1, 0)) // Vector2(4, 4)
+ * ```
+ */
 export class Vector2 {
   constructor(
     public x: number = 0,

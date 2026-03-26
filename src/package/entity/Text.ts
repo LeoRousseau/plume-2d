@@ -10,7 +10,16 @@ export type TextAlign = 'left' | 'center' | 'right'
 /** Vertical text baseline. */
 export type TextBaseline = 'top' | 'middle' | 'alphabetic' | 'bottom'
 
-/** A text label positioned at a point in 2D space. */
+/**
+ * A text label positioned at a point in 2D space.
+ *
+ * @example
+ * ```ts
+ * const t = new Text('Hello', new Vector2(50, 100), 24, 'Arial')
+ * t.fill = { color: '#fff' }
+ * t.textAlign = 'center'
+ * ```
+ */
 export class Text extends AShape {
   /** The text string to display. */
   content: string

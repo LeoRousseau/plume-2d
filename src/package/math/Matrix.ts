@@ -8,6 +8,12 @@ import { MATRIX_EPSILON } from './constants'
  *   | a  c  tx |
  *   | b  d  ty |
  *   | 0  0  1  |
+ *
+ * @example
+ * ```ts
+ * const m = Matrix.compose(new Vector2(10, 20), Math.PI / 4, new Vector2(1, 1))
+ * const p = m.transformPoint(new Vector2(5, 0))
+ * ```
  */
 export class Matrix {
   constructor(

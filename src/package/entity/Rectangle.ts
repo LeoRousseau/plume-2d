@@ -5,7 +5,16 @@ import { AShape } from './Shape'
 import { Polyline } from './Polyline'
 import { distancePointToRectEdge } from '../geometry/distance'
 
-/** An axis-aligned rectangle defined by its top-left origin, width, and height. */
+/**
+ * An axis-aligned rectangle defined by its top-left origin, width, and height.
+ *
+ * @example
+ * ```ts
+ * const r = new Rectangle(new Vector2(10, 20), 200, 100)
+ * r.area()      // 20000
+ * r.perimeter()  // 600
+ * ```
+ */
 export class Rectangle extends AShape {
   /** Top-left corner. */
   origin: Vector2

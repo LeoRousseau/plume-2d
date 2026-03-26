@@ -1,6 +1,18 @@
 import { Vector2 } from './Vector2'
 
-/** Axis-Aligned Bounding Box (AABB). */
+/**
+ * Axis-aligned bounding box defined by min and max corners.
+ *
+ * Uses screen coordinates: min is top-left, max is bottom-right (Y-down).
+ *
+ * @example
+ * ```ts
+ * const bb = BoundingBox.fromPoints([new Vector2(0, 0), new Vector2(100, 50)])
+ * bb.width    // 100
+ * bb.height   // 50
+ * bb.center() // Vector2(50, 25)
+ * ```
+ */
 export class BoundingBox {
   constructor(
     /** Bottom-left corner (minimum x/y). */

@@ -3,7 +3,16 @@ import { BoundingBox } from '../math/BoundingBox'
 import type { IRenderer } from '../rendering/IRenderer'
 import { AShape } from './Shape'
 
-/** An axis-aligned ellipse defined by center and two radii. */
+/**
+ * An axis-aligned ellipse defined by center and two radii.
+ *
+ * @example
+ * ```ts
+ * const e = new Ellipse(new Vector2(200, 150), 80, 50)
+ * e.area()      // ~12566
+ * e.perimeter()  // ~417
+ * ```
+ */
 export class Ellipse extends AShape {
   center: Vector2
   /** Horizontal radius. */

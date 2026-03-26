@@ -4,7 +4,16 @@ import { TWO_PI, EPSILON } from '../math/constants'
 import type { IRenderer } from '../rendering/IRenderer'
 import { AShape } from './Shape'
 
-/** A circular arc defined by center, radius, start angle and end angle (in radians). */
+/**
+ * A circular arc defined by center, radius, start angle and end angle (in radians).
+ *
+ * @example
+ * ```ts
+ * const a = new Arc(new Vector2(100, 100), 50, 0, Math.PI)
+ * a.perimeter()  // ~157 (half circumference)
+ * a.startPoint() // Vector2(150, 100)
+ * ```
+ */
 export class Arc extends AShape {
   center: Vector2
   radius: number

@@ -3,7 +3,18 @@ import { BoundingBox } from '../math/BoundingBox'
 import type { IRenderer } from '../rendering/IRenderer'
 import { AShape } from './Shape'
 
-/** A circle defined by a center point and radius. */
+/**
+ * A circle defined by a center point and radius.
+ *
+ * @example
+ * ```ts
+ * const c = new Circle(new Vector2(100, 100), 50)
+ * c.stroke = { color: '#0ff', width: 2 }
+ * c.fill = { color: 'rgba(0,255,255,0.2)' }
+ * c.area()      // ~7854
+ * c.perimeter()  // ~314
+ * ```
+ */
 export class Circle extends AShape {
   center: Vector2
   radius: number
