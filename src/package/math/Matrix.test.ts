@@ -85,7 +85,8 @@ describe('Matrix', () => {
   it('invert() produces the inverse matrix', () => {
     const m = Matrix.compose(new Vector2(10, 20), Math.PI / 4, new Vector2(2, 3))
     const inv = m.invert()
-    const result = m.multiply(inv)
+    expect(inv).not.toBeNull()
+    const result = m.multiply(inv!)
     expect(result.a).toBeCloseTo(1)
     expect(result.b).toBeCloseTo(0)
     expect(result.c).toBeCloseTo(0)
@@ -94,10 +95,16 @@ describe('Matrix', () => {
     expect(result.ty).toBeCloseTo(0)
   })
 
-  it('invert() returns identity for singular matrix', () => {
+  it('invert() returns null for singular matrix', () => {
     const m = new Matrix(0, 0, 0, 0, 5, 5)
-    const inv = m.invert()
-    expect(inv.toArray()).toEqual([1, 0, 0, 1, 0, 0])
+    expect(m.invert()).toBeNull()
+  })
+
+  it('determinant()', () => {
+    const m = new Matrix(2, 0, 0, 3, 0, 0)
+    expect(m.determinant()).toBe(6)
+    const singular = new Matrix(1, 2, 2, 4, 0, 0)
+    expect(singular.determinant()).toBe(0)
   })
 
   it('decompose() round-trips with compose()', () => {

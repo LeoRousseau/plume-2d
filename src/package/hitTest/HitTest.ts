@@ -44,7 +44,9 @@ export function hitTest(node: Node, worldPoint: Vector2, tolerance: number = 2):
 
   if (!(node instanceof AShape)) return null
 
-  const localPoint = node.transform.worldMatrix.invert().transformPoint(worldPoint)
+  const inv = node.transform.worldMatrix.invert()
+  if (!inv) return null
+  const localPoint = inv.transformPoint(worldPoint)
 
   if (testShape(node, localPoint, tolerance)) {
     return { shape: node, point: localPoint }

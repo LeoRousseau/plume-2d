@@ -68,9 +68,17 @@ export class Matrix {
     )
   }
 
-  invert(): Matrix {
-    const det = this.a * this.d - this.b * this.c
-    if (det === 0) return Matrix.identity()
+  /** Returns the determinant of this matrix. */
+  determinant(): number {
+    return this.a * this.d - this.b * this.c
+  }
+
+  /**
+   * Returns the inverse of this matrix, or `null` if the matrix is singular (non-invertible).
+   */
+  invert(): Matrix | null {
+    const det = this.determinant()
+    if (Math.abs(det) < 1e-12) return null
     const invDet = 1 / det
     return new Matrix(
       this.d * invDet,

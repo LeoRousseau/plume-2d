@@ -51,6 +51,66 @@ describe('Arc', () => {
     expect(a.containsPoint(new Vector2(-10, 0))).toBe(false)
   })
 
+  it('containsPoint with custom tolerance', () => {
+    const a = new Arc(new Vector2(0, 0), 10, 0, Math.PI / 2)
+    // Point at distance 12 from center (2 units from arc edge)
+    expect(a.containsPoint(new Vector2(12, 0), 3)).toBe(true)
+    expect(a.containsPoint(new Vector2(12, 0), 1)).toBe(false)
+  })
+
+  it('containsPoint on arc crossing 0 degrees (wrap-around)', () => {
+    // Arc from 350° to 10° (small arc crossing 0°)
+    const deg = (d: number) => d * Math.PI / 180
+    const a = new Arc(new Vector2(0, 0), 10, deg(350), deg(10))
+
+    // Point at angle 0° (on the arc)
+    expect(a.containsPoint(new Vector2(10, 0))).toBe(true)
+    // Point at angle 355° (on the arc)
+    expect(a.containsPoint(new Vector2(10 * Math.cos(deg(355)), 10 * Math.sin(deg(355))))).toBe(true)
+    // Point at angle 5° (on the arc)
+    expect(a.containsPoint(new Vector2(10 * Math.cos(deg(5)), 10 * Math.sin(deg(5))))).toBe(true)
+    // Point at angle 180° (NOT on the arc)
+    expect(a.containsPoint(new Vector2(-10, 0))).toBe(false)
+    // Point at angle 90° (NOT on the arc)
+    expect(a.containsPoint(new Vector2(0, 10))).toBe(false)
+  })
+
+  it('containsPoint with negative start angle', () => {
+    // Arc from -π/4 to π/4 (crossing 0°)
+    const a = new Arc(new Vector2(0, 0), 10, -Math.PI / 4, Math.PI / 4)
+    // Point at angle 0° (on the arc)
+    expect(a.containsPoint(new Vector2(10, 0))).toBe(true)
+    // Point at angle π (NOT on the arc)
+    expect(a.containsPoint(new Vector2(-10, 0))).toBe(false)
+  })
+
+  it('containsPoint on full circle arc', () => {
+    const a = new Arc(new Vector2(0, 0), 10, 0, Math.PI * 2)
+    // Every angle should be on the arc
+    expect(a.containsPoint(new Vector2(10, 0))).toBe(true)
+    expect(a.containsPoint(new Vector2(0, 10))).toBe(true)
+    expect(a.containsPoint(new Vector2(-10, 0))).toBe(true)
+    expect(a.containsPoint(new Vector2(0, -10))).toBe(true)
+  })
+
+  it('containsPoint on arc > π (large sweep)', () => {
+    // Arc from 0 to 270° (3/4 of circle)
+    const a = new Arc(new Vector2(0, 0), 10, 0, 3 * Math.PI / 2)
+    expect(a.containsPoint(new Vector2(10, 0))).toBe(true)   // 0°
+    expect(a.containsPoint(new Vector2(0, 10))).toBe(true)    // 90°
+    expect(a.containsPoint(new Vector2(-10, 0))).toBe(true)   // 180°
+    expect(a.containsPoint(new Vector2(0, -10))).toBe(true)   // 270° = end angle (inclusive)
+    // Point just past the end at ~280° should NOT be on the arc
+    const deg280 = 280 * Math.PI / 180
+    expect(a.containsPoint(new Vector2(10 * Math.cos(deg280), 10 * Math.sin(deg280)))).toBe(false)
+  })
+
+  it('area of semicircle sector', () => {
+    const a = new Arc(new Vector2(0, 0), 10, 0, Math.PI)
+    // Area = 0.5 * r² * θ = 0.5 * 100 * π
+    expect(a.area()).toBeCloseTo(50 * Math.PI)
+  })
+
   it('calls renderer.drawArc on draw', () => {
     const a = new Arc()
     a.draw(mockRenderer)

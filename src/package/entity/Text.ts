@@ -50,8 +50,14 @@ export class Text extends AShape {
     renderer.drawText(this)
   }
 
+  /**
+   * Returns an approximate bounding box for this text.
+   *
+   * **Note:** This is an estimation based on a fixed character-width ratio (0.6 × fontSize).
+   * Actual width varies depending on the font, characters, and rendering engine.
+   * For pixel-accurate bounds, use `CanvasRenderingContext2D.measureText()` externally.
+   */
   getBoundingBox(): BoundingBox {
-    // Approximate: assumes ~0.6 × fontSize per character width
     const charWidth = this.fontSize * 0.6
     const w = this.content.length * charWidth
     const h = this.fontSize

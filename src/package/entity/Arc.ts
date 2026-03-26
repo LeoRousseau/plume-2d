@@ -85,9 +85,15 @@ export class Arc extends AShape {
   }
 
   private containsAngle(angle: number): boolean {
-    let start = ((this.startAngle % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2)
-    let end = ((this.endAngle % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2)
-    const a = ((angle % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2)
+    const TWO_PI = Math.PI * 2
+    // If sweep covers a full circle or more, every angle is contained
+    const sweep = Math.abs(this.endAngle - this.startAngle)
+    if (sweep >= TWO_PI - 1e-10) return true
+
+    const normalize = (a: number) => ((a % TWO_PI) + TWO_PI) % TWO_PI
+    const start = normalize(this.startAngle)
+    const end = normalize(this.endAngle)
+    const a = normalize(angle)
     if (start <= end) {
       return a >= start && a <= end
     }

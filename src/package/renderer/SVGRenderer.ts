@@ -163,7 +163,12 @@ export class SVGRenderer implements IRenderer {
       attrs.push(`stroke="${text.stroke.color}"`, `stroke-width="${text.stroke.width}"`)
       if (text.stroke.opacity !== undefined) attrs.push(`stroke-opacity="${text.stroke.opacity}"`)
     }
-    const escaped = text.content.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    const escaped = text.content
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;')
 
     this.elements.push(
       `  <g transform="${transform}">`,
