@@ -7,6 +7,7 @@ import { Rectangle } from '../entity/Rectangle'
 import { Ellipse } from '../entity/Ellipse'
 import { Arc } from '../entity/Arc'
 import { Path } from '../entity/Path'
+import { Text } from '../entity/Text'
 import { pick } from './HitTest'
 
 describe('HitTest', () => {
@@ -127,5 +128,43 @@ describe('HitTest', () => {
     scene.root.addChild(c2) // c2 is on top
 
     expect(pick(scene, new Vector2(50, 50))?.shape).toBe(c2)
+  })
+
+  it('picks a text shape', () => {
+    const scene = new Scene()
+    const t = new Text('Hello', new Vector2(10, 50), 20)
+    t.textAlign = 'left'
+    t.textBaseline = 'top'
+    scene.root.addChild(t)
+
+    expect(pick(scene, new Vector2(20, 60))?.shape).toBe(t)
+    expect(pick(scene, new Vector2(500, 500))).toBeNull()
+  })
+
+  it('picks a shape with transform', () => {
+    const scene = new Scene()
+    const c = new Circle(new Vector2(0, 0), 20)
+    c.fill = { color: '#f00' }
+    c.transform.position = new Vector2(100, 100)
+    scene.root.addChild(c)
+
+    expect(pick(scene, new Vector2(100, 100))?.shape).toBe(c)
+    expect(pick(scene, new Vector2(0, 0))).toBeNull()
+  })
+
+  it('returns null for non-invertible transform', () => {
+    const scene = new Scene()
+    const c = new Circle(new Vector2(0, 0), 20)
+    c.fill = { color: '#f00' }
+    c.transform.scale = new Vector2(0, 0)
+    scene.root.addChild(c)
+
+    expect(pick(scene, new Vector2(0, 0))).toBeNull()
+  })
+
+  it('returns null on empty scene', () => {
+    const scene = new Scene()
+
+    expect(pick(scene, new Vector2(50, 50))).toBeNull()
   })
 })
