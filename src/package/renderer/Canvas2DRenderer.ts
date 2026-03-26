@@ -113,7 +113,7 @@ export class Canvas2DRenderer implements IRenderer {
     this.ctx.textAlign = text.textAlign
     this.ctx.textBaseline = text.textBaseline
 
-    if (text.fill.color !== 'transparent') {
+    if (text.fill) {
       this.ctx.save()
       if (text.fill.opacity !== undefined) this.ctx.globalAlpha = text.fill.opacity
       this.ctx.fillStyle = text.fill.color
@@ -121,7 +121,7 @@ export class Canvas2DRenderer implements IRenderer {
       this.ctx.restore()
     }
 
-    if (text.stroke.width > 0 && text.stroke.color !== 'transparent') {
+    if (text.stroke.width > 0) {
       this.ctx.save()
       if (text.stroke.opacity !== undefined) this.ctx.globalAlpha = text.stroke.opacity
       this.ctx.strokeStyle = text.stroke.color
@@ -131,8 +131,8 @@ export class Canvas2DRenderer implements IRenderer {
     }
   }
 
-  private applyFill(fill: FillStyle): void {
-    if (fill.color !== 'transparent') {
+  private applyFill(fill: FillStyle | null): void {
+    if (fill) {
       this.ctx.save()
       if (fill.opacity !== undefined) this.ctx.globalAlpha = fill.opacity
       this.ctx.fillStyle = fill.color

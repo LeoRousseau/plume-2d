@@ -2,14 +2,6 @@ import { Vector2 } from '../math/Vector2'
 import type { Node } from '../core/Node'
 import type { Scene } from '../core/Scene'
 import { AShape } from '../entity/Shape'
-import { Polyline } from '../entity/Polyline'
-import { Circle } from '../entity/Circle'
-import { Rectangle } from '../entity/Rectangle'
-import { Ellipse } from '../entity/Ellipse'
-import { Arc } from '../entity/Arc'
-import { Path } from '../entity/Path'
-import { Text } from '../entity/Text'
-import { distancePointToPolylineEdge, distancePointToRectEdge, distancePointToPathEdge } from '../geometry/distance'
 
 /** Result returned by {@link hitTest} when a shape is hit. */
 export interface HitTestResult {
@@ -48,62 +40,18 @@ export function hitTest(node: Node, worldPoint: Vector2, tolerance: number = 2):
   if (!inv) return null
   const localPoint = inv.transformPoint(worldPoint)
 
-  if (testShape(node, localPoint, tolerance)) {
+  const bb = node.getBoundingBox().pad(tolerance)
+  if (!bb.containsPoint(localPoint)) return null
+
+  // Filled shape: containsPoint is enough
+  if (node.fill && node.containsPoint(localPoint)) {
+    return { shape: node, point: localPoint }
+  }
+
+  // Stroke-only or edge proximity
+  if (node.distanceToEdge(localPoint) <= tolerance) {
     return { shape: node, point: localPoint }
   }
 
   return null
-}
-
-function testShape(shape: AShape, p: Vector2, tolerance: number): boolean {
-  const bb = shape.getBoundingBox().pad(tolerance)
-  if (!bb.containsPoint(p)) return false
-
-  if (shape instanceof Polyline) {
-    if (shape.isClosed && shape.fill.color !== 'transparent') {
-      return shape.containsPoint(p)
-    }
-    return distancePointToPolylineEdge(p, shape) <= tolerance
-  }
-
-  if (shape instanceof Circle) {
-    if (shape.fill.color !== 'transparent') {
-      return shape.containsPoint(p)
-    }
-    return Math.abs(p.distanceTo(shape.center) - shape.radius) <= tolerance
-  }
-
-  if (shape instanceof Rectangle) {
-    if (shape.fill.color !== 'transparent') {
-      return shape.containsPoint(p)
-    }
-    return distancePointToRectEdge(p, shape) <= tolerance
-  }
-
-  if (shape instanceof Ellipse) {
-    if (shape.fill.color !== 'transparent') {
-      return shape.containsPoint(p)
-    }
-    const dx = p.x - shape.center.x
-    const dy = p.y - shape.center.y
-    const val = (dx * dx) / (shape.rx * shape.rx) + (dy * dy) / (shape.ry * shape.ry)
-    return Math.abs(val - 1) <= tolerance / Math.min(shape.rx, shape.ry)
-  }
-
-  if (shape instanceof Arc) {
-    return shape.containsPoint(p, tolerance)
-  }
-
-  if (shape instanceof Path) {
-    if (shape.fill.color !== 'transparent' && shape.containsPoint(p)) {
-      return true
-    }
-    return distancePointToPathEdge(p, shape) <= tolerance
-  }
-
-  if (shape instanceof Text) {
-    return shape.getBoundingBox().containsPoint(p)
-  }
-
-  return false
 }

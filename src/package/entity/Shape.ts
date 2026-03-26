@@ -5,7 +5,6 @@ import type { Vector2 } from '../math/Vector2'
 import type { StrokeStyle } from './StrokeStyle'
 import type { FillStyle } from './FillStyle'
 import { defaultStroke } from './StrokeStyle'
-import { defaultFill } from './FillStyle'
 
 /**
  * Abstract base class for all drawable shapes.
@@ -17,13 +16,13 @@ import { defaultFill } from './FillStyle'
 export abstract class AShape extends Node {
   /** Stroke styling (color, width, dash pattern, etc.). */
   stroke: StrokeStyle
-  /** Fill styling (color, opacity). */
-  fill: FillStyle
+  /** Fill styling, or `null` for no fill (stroke only). */
+  fill: FillStyle | null
 
   constructor() {
     super()
     this.stroke = defaultStroke()
-    this.fill = defaultFill()
+    this.fill = null
   }
 
   /** Returns the axis-aligned bounding box of this shape in local coordinates. */
@@ -36,4 +35,6 @@ export abstract class AShape extends Node {
   abstract area(): number
   /** Returns the perimeter (boundary length) of this shape. */
   abstract perimeter(): number
+  /** Returns the shortest distance from `p` to the edge of this shape. */
+  abstract distanceToEdge(p: Vector2): number
 }

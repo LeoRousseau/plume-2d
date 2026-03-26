@@ -37,7 +37,7 @@ export class Text extends AShape {
     this.fontFamily = fontFamily
     this.textAlign = 'left'
     this.textBaseline = 'alphabetic'
-    this.stroke = { color: 'transparent', width: 0 }
+    this.stroke = { color: '#ffffff', width: 0 }
     this.fill = { color: '#ffffff' }
   }
 
@@ -90,5 +90,15 @@ export class Text extends AShape {
   perimeter(): number {
     const bb = this.getBoundingBox()
     return 2 * (bb.width + bb.height)
+  }
+
+  distanceToEdge(p: Vector2): number {
+    const bb = this.getBoundingBox()
+    if (bb.containsPoint(p)) return 0
+    const cx = Math.max(bb.min.x, Math.min(p.x, bb.max.x))
+    const cy = Math.max(bb.min.y, Math.min(p.y, bb.max.y))
+    const dx = p.x - cx
+    const dy = p.y - cy
+    return Math.sqrt(dx * dx + dy * dy)
   }
 }

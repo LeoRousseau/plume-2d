@@ -317,7 +317,7 @@ input.onDblClick = () => {
 document.querySelector('#btn-dashed')!.addEventListener('click', () => {
   const r = new Rectangle(new Vector2(randomX() - 50, randomY() - 35), 100, 70)
   r.stroke = { color: '#fa0', width: 2, dashArray: [8, 4] }
-  r.fill = { color: 'transparent' }
+  r.fill = null
   addShape(r)
   showInfo('Rectangle with dashed stroke [8, 4]')
 })

@@ -156,10 +156,10 @@ export class SVGRenderer implements IRenderer {
       `font-family="${text.fontFamily}"`,
       `text-anchor="${text.textAlign === 'center' ? 'middle' : text.textAlign === 'right' ? 'end' : 'start'}"`,
       `dominant-baseline="${text.textBaseline === 'middle' ? 'central' : text.textBaseline === 'top' ? 'hanging' : text.textBaseline === 'bottom' ? 'text-bottom' : 'auto'}"`,
-      `fill="${text.fill.color}"`,
+      `fill="${text.fill ? text.fill.color : 'none'}"`,
     ]
-    if (text.fill.opacity !== undefined) attrs.push(`fill-opacity="${text.fill.opacity}"`)
-    if (text.stroke.width > 0 && text.stroke.color !== 'transparent') {
+    if (text.fill?.opacity !== undefined) attrs.push(`fill-opacity="${text.fill.opacity}"`)
+    if (text.stroke.width > 0) {
       attrs.push(`stroke="${text.stroke.color}"`, `stroke-width="${text.stroke.width}"`)
       if (text.stroke.opacity !== undefined) attrs.push(`stroke-opacity="${text.stroke.opacity}"`)
     }
@@ -177,18 +177,18 @@ export class SVGRenderer implements IRenderer {
     )
   }
 
-  private buildStyleAttrs(stroke: StrokeStyle, fill: FillStyle): string {
+  private buildStyleAttrs(stroke: StrokeStyle, fill: FillStyle | null): string {
     const attrs: string[] = [
       `stroke="${stroke.color}"`,
       `stroke-width="${stroke.width}"`,
-      `fill="${fill.color}"`,
+      `fill="${fill ? fill.color : 'none'}"`,
     ]
     if (stroke.dashArray) attrs.push(`stroke-dasharray="${stroke.dashArray.join(',')}"`)
     if (stroke.dashOffset !== undefined) attrs.push(`stroke-dashoffset="${stroke.dashOffset}"`)
     if (stroke.lineCap) attrs.push(`stroke-linecap="${stroke.lineCap}"`)
     if (stroke.lineJoin) attrs.push(`stroke-linejoin="${stroke.lineJoin}"`)
     if (stroke.opacity !== undefined) attrs.push(`stroke-opacity="${stroke.opacity}"`)
-    if (fill.opacity !== undefined) attrs.push(`fill-opacity="${fill.opacity}"`)
+    if (fill?.opacity !== undefined) attrs.push(`fill-opacity="${fill.opacity}"`)
     return attrs.join(' ')
   }
 

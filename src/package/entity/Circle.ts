@@ -39,4 +39,8 @@ export class Circle extends AShape {
   containsPoint(p: Vector2): boolean {
     return p.distanceTo(this.center) <= this.radius
   }
+
+  distanceToEdge(p: Vector2): number {
+    return Math.abs(p.distanceTo(this.center) - this.radius)
+  }
 }

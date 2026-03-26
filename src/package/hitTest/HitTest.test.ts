@@ -24,7 +24,7 @@ describe('HitTest', () => {
   it('picks a stroked circle by its edge', () => {
     const scene = new Scene()
     const c = new Circle(new Vector2(50, 50), 20)
-    c.fill = { color: 'transparent' }
+    c.fill = null
     scene.root.addChild(c)
 
     // On the edge
@@ -50,7 +50,7 @@ describe('HitTest', () => {
   it('picks a stroked rectangle by edge', () => {
     const scene = new Scene()
     const r = new Rectangle(new Vector2(10, 10), 40, 30)
-    r.fill = { color: 'transparent' }
+    r.fill = null
     scene.root.addChild(r)
 
     // On top edge

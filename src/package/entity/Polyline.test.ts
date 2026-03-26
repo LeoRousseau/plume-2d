@@ -30,7 +30,7 @@ describe('Polyline', () => {
 
   it('has default style properties', () => {
     const p = new Polyline()
-    expect(p.fill.color).toBe('transparent')
+    expect(p.fill).toBeNull()
     expect(p.stroke.color).toBe('#ffffff')
     expect(p.stroke.width).toBe(1)
   })

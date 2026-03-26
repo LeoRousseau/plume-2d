@@ -3,6 +3,7 @@ import { BoundingBox } from '../math/BoundingBox'
 import type { IRenderer } from '../rendering/IRenderer'
 import { AShape } from './Shape'
 import type { PathSegment } from './PathSegment'
+import { distancePointToPathEdge } from '../geometry/distance'
 
 /**
  * A general-purpose path composed of move, line, quadratic, cubic, and close segments.
@@ -107,6 +108,10 @@ export class Path extends AShape {
       }
     }
     return inside
+  }
+
+  distanceToEdge(p: Vector2): number {
+    return distancePointToPathEdge(p, this)
   }
 
   /**

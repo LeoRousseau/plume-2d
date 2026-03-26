@@ -3,6 +3,7 @@ import { BoundingBox } from '../math/BoundingBox'
 import type { IRenderer } from '../rendering/IRenderer'
 import { AShape } from './Shape'
 import { Polyline } from './Polyline'
+import { distancePointToRectEdge } from '../geometry/distance'
 
 /** An axis-aligned rectangle defined by its top-left origin, width, and height. */
 export class Rectangle extends AShape {
@@ -47,6 +48,10 @@ export class Rectangle extends AShape {
       p.y >= this.origin.y &&
       p.y <= this.origin.y + this.height
     )
+  }
+
+  distanceToEdge(p: Vector2): number {
+    return distancePointToRectEdge(p, this)
   }
 
   /** Converts this rectangle to a closed 4-point {@link Polyline}. */

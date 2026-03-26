@@ -84,6 +84,13 @@ export class Arc extends AShape {
     return this.containsAngle(angle)
   }
 
+  distanceToEdge(p: Vector2): number {
+    const dist = p.distanceTo(this.center)
+    const angle = Math.atan2(p.y - this.center.y, p.x - this.center.x)
+    if (!this.containsAngle(angle)) return Infinity
+    return Math.abs(dist - this.radius)
+  }
+
   private containsAngle(angle: number): boolean {
     const TWO_PI = Math.PI * 2
     // If sweep covers a full circle or more, every angle is contained

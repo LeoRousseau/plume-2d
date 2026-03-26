@@ -2,6 +2,7 @@ import { Vector2 } from '../math/Vector2'
 import { BoundingBox } from '../math/BoundingBox'
 import type { IRenderer } from '../rendering/IRenderer'
 import { AShape } from './Shape'
+import { distancePointToPolylineEdge } from '../geometry/distance'
 
 /**
  * A shape defined by an ordered list of 2D points.
@@ -118,6 +119,10 @@ export class Polyline extends AShape {
     return inside
   }
 
+  distanceToEdge(p: Vector2): number {
+    return distancePointToPolylineEdge(p, this)
+  }
+
   /**
    * Returns a simplified copy using the Douglas-Peucker algorithm.
    * @param tolerance - Maximum allowed perpendicular distance.
@@ -127,7 +132,7 @@ export class Polyline extends AShape {
     const kept = douglasPeucker(this.points, tolerance)
     const result = new Polyline(kept, this.isClosed)
     result.stroke = { ...this.stroke }
-    result.fill = { ...this.fill }
+    result.fill = this.fill ? { ...this.fill } : null
     return result
   }
 
@@ -135,7 +140,7 @@ export class Polyline extends AShape {
   reverse(): Polyline {
     const result = new Polyline([...this.points].reverse(), this.isClosed)
     result.stroke = { ...this.stroke }
-    result.fill = { ...this.fill }
+    result.fill = this.fill ? { ...this.fill } : null
     return result
   }
 }

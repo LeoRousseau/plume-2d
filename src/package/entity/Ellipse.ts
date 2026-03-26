@@ -48,4 +48,11 @@ export class Ellipse extends AShape {
     const dy = p.y - this.center.y
     return (dx * dx) / (this.rx * this.rx) + (dy * dy) / (this.ry * this.ry) <= 1
   }
+
+  distanceToEdge(p: Vector2): number {
+    const dx = p.x - this.center.x
+    const dy = p.y - this.center.y
+    const val = (dx * dx) / (this.rx * this.rx) + (dy * dy) / (this.ry * this.ry)
+    return Math.abs(val - 1) * Math.min(this.rx, this.ry)
+  }
 }
