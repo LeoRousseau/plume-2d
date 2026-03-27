@@ -2,7 +2,7 @@ import { Node } from '../core/Node'
 import type { Scene } from '../core/Scene'
 import type { View } from '../view/View'
 import { TWO_PI } from '../math/constants'
-import { AShape } from '../entity/Shape'
+import { ARenderable } from '../entity/Renderable'
 import type { Polyline } from '../entity/Polyline'
 import type { Circle } from '../entity/Circle'
 import type { Rectangle } from '../entity/Rectangle'
@@ -287,7 +287,7 @@ export class SVGRenderer implements IRenderer {
       `translate(${t.position.x},${t.position.y}) rotate(${(t.rotation * 180) / Math.PI}) scale(${t.scale.x},${t.scale.y})`,
     )
 
-    if (node instanceof AShape) {
+    if (node instanceof ARenderable) {
       node.draw(this)
     }
 

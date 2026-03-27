@@ -75,10 +75,9 @@ describe('Path edge cases', () => {
 })
 
 describe('Text edge cases', () => {
-  it('empty content: getBoundingBox has width=0, area=0', () => {
+  it('empty content: getBoundingBox has width=0', () => {
     const t = new Text('', new Vector2())
     const bb = t.getBoundingBox()
     expect(bb.width).toBe(0)
-    expect(t.area()).toBe(0)
   })
 })

@@ -2,7 +2,7 @@ import { Node } from '../core/Node'
 import type { Scene } from '../core/Scene'
 import type { View } from '../view/View'
 import { TWO_PI } from '../math/constants'
-import { AShape } from '../entity/Shape'
+import { ARenderable } from '../entity/Renderable'
 import type { Polyline } from '../entity/Polyline'
 import type { Circle } from '../entity/Circle'
 import type { Rectangle } from '../entity/Rectangle'
@@ -252,7 +252,7 @@ export class Canvas2DRenderer implements IRenderer {
     this.ctx.save()
     this.applyTransform(node)
 
-    if (node instanceof AShape) {
+    if (node instanceof ARenderable) {
       node.draw(this)
     }
 

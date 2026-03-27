@@ -2,13 +2,15 @@ import { Vector2 } from '../math/Vector2'
 import { DEFAULT_HIT_TOLERANCE } from '../math/constants'
 import type { Node } from '../core/Node'
 import type { Scene } from '../core/Scene'
+import { ARenderable } from '../entity/Renderable'
 import { AShape } from '../entity/Shape'
+import { Text } from '../entity/Text'
 
 /** Result returned by {@link hitTest} when a shape is hit. */
 export interface HitTestResult {
-  /** The shape that was hit. */
-  shape: AShape
-  /** The test point in the shape's local coordinate space. */
+  /** The renderable node that was hit. */
+  shape: ARenderable
+  /** The test point in the node's local coordinate space. */
   point: Vector2
 }
 
@@ -30,7 +32,7 @@ export function pick(scene: Scene, worldPoint: Vector2, tolerance: number = DEFA
 
 /**
  * Recursively hit-tests a node tree at the given world-space point.
- * Children are tested in reverse order so the top-most (last-added) shape wins.
+ * Children are tested in reverse order so the top-most (last-added) node wins.
  *
  * @param node       - Root node to start testing from.
  * @param worldPoint - Point in world coordinates.
@@ -43,11 +45,20 @@ export function hitTest(node: Node, worldPoint: Vector2, tolerance: number = DEF
     if (result) return result
   }
 
-  if (!(node instanceof AShape)) return null
-
   const inv = node.transform.worldMatrix.invert()
   if (!inv) return null
   const localPoint = inv.transformPoint(worldPoint)
+
+  // Text: bounding box hit test only
+  if (node instanceof Text) {
+    const bb = node.getBoundingBox()
+    if (bb.containsPoint(localPoint)) {
+      return { shape: node, point: localPoint }
+    }
+    return null
+  }
+
+  if (!(node instanceof AShape)) return null
 
   const bb = node.getBoundingBox().pad(tolerance)
   if (!bb.containsPoint(localPoint)) return null

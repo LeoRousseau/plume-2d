@@ -10,6 +10,7 @@ export { Transform } from './core/Transform'
 export { Scene } from './core/Scene'
 
 // Entity
+export { ARenderable } from './entity/Renderable'
 export { AShape } from './entity/Shape'
 export { Polyline } from './entity/Polyline'
 export { Circle } from './entity/Circle'

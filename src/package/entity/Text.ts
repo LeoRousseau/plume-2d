@@ -2,8 +2,7 @@ import { Vector2 } from '../math/Vector2'
 import { BoundingBox } from '../math/BoundingBox'
 import { TEXT_CHAR_WIDTH_RATIO, TEXT_ALPHABETIC_RATIO } from '../math/constants'
 import type { IRenderer } from '../renderer/IRenderer'
-import { AShape } from './Shape'
-import { Path } from './Path'
+import { ARenderable } from './Renderable'
 
 /** Horizontal text alignment. */
 export type TextAlign = 'left' | 'center' | 'right'
@@ -14,6 +13,10 @@ export type TextBaseline = 'top' | 'middle' | 'alphabetic' | 'bottom'
 /**
  * A text label positioned at a point in 2D space.
  *
+ * Extends {@link ARenderable} for visual properties (stroke, fill, draw)
+ * but is not an {@link AShape} — geometric operations (area, perimeter,
+ * distanceToEdge) are not meaningful for rendered text.
+ *
  * @example
  * ```ts
  * const t = new Text('Hello', new Vector2(50, 100), 24, 'Arial')
@@ -21,7 +24,7 @@ export type TextBaseline = 'top' | 'middle' | 'alphabetic' | 'bottom'
  * t.textAlign = 'center'
  * ```
  */
-export class Text extends AShape {
+export class Text extends ARenderable {
   /** The text string to display. */
   content: string
   /** Anchor position. */
@@ -89,40 +92,5 @@ export class Text extends AShape {
   /** Returns `true` if the point lies inside the text bounding box. */
   containsPoint(p: Vector2): boolean {
     return this.getBoundingBox().containsPoint(p)
-  }
-
-  /** Area of the text bounding box. */
-  area(): number {
-    const bb = this.getBoundingBox()
-    return bb.width * bb.height
-  }
-
-  /** Perimeter of the text bounding box. */
-  perimeter(): number {
-    const bb = this.getBoundingBox()
-    return 2 * (bb.width + bb.height)
-  }
-
-  distanceToEdge(p: Vector2): number {
-    const bb = this.getBoundingBox()
-    if (bb.containsPoint(p)) return 0
-    const cx = Math.max(bb.min.x, Math.min(p.x, bb.max.x))
-    const cy = Math.max(bb.min.y, Math.min(p.y, bb.max.y))
-    const dx = p.x - cx
-    const dy = p.y - cy
-    return Math.sqrt(dx * dx + dy * dy)
-  }
-
-  toPath(): Path {
-    const bb = this.getBoundingBox()
-    const p = new Path()
-      .moveTo(new Vector2(bb.min.x, bb.min.y))
-      .lineTo(new Vector2(bb.max.x, bb.min.y))
-      .lineTo(new Vector2(bb.max.x, bb.max.y))
-      .lineTo(new Vector2(bb.min.x, bb.max.y))
-      .close()
-    p.stroke = { ...this.stroke }
-    p.fill = this.fill ? { ...this.fill } : null
-    return p
   }
 }

@@ -1,5 +1,5 @@
 import {
-  Vector2, Scene, View, Polyline, Circle, Rectangle, Ellipse, Arc, Path, Text,
+  Vector2, Node, Scene, View, Polyline, Circle, Rectangle, Ellipse, Arc, Path, Text,
   Canvas2DRenderer, SVGRenderer, BoundingBox, hitTest,
   intersectLineLine, intersectLineCircle, intersectCircleCircle,
   distancePointToPolyline, distancePointToCircle, closestPointOnPolyline,
@@ -36,7 +36,7 @@ let hitTestOverlay: (() => void) | null = null
 let snapOverlay: (() => void) | null = null
 
 // --- Helpers ---
-function addShape(s: AShape) {
+function addShape(s: Node) {
   scene.root.addChild(s)
   render()
 }
