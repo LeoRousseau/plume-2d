@@ -1,4 +1,5 @@
 import { Vector2 } from '../math/Vector2'
+import { CURVE_SUBDIVISIONS } from '../math/constants'
 import type { Polyline } from '../entity/Polyline'
 import type { Circle } from '../entity/Circle'
 import type { Rectangle } from '../entity/Rectangle'
@@ -93,7 +94,7 @@ export function distancePointToRectEdge(point: Vector2, rect: Rectangle): number
 }
 
 /** Shortest distance from `point` to the edge of a {@link Path} (linearized). */
-export function distancePointToPathEdge(point: Vector2, path: Path, steps = 8): number {
+export function distancePointToPathEdge(point: Vector2, path: Path, steps = CURVE_SUBDIVISIONS): number {
   const pts = path.toPolylinePoints(steps)
   let minDist = Infinity
   for (let i = 0; i < pts.length - 1; i++) {

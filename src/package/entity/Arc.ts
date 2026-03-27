@@ -97,8 +97,10 @@ export class Arc extends AShape {
   distanceToEdge(p: Vector2): number {
     const dist = p.distanceTo(this.center)
     const angle = Math.atan2(p.y - this.center.y, p.x - this.center.x)
-    if (!this.containsAngle(angle)) return Infinity
-    return Math.abs(dist - this.radius)
+    if (this.containsAngle(angle)) {
+      return Math.abs(dist - this.radius)
+    }
+    return Math.min(p.distanceTo(this.startPoint()), p.distanceTo(this.endPoint()))
   }
 
   private containsAngle(angle: number): boolean {

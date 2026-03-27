@@ -72,7 +72,7 @@ export function intersectCircleCircle(
   c2: { center: Vector2; radius: number },
 ): Vector2[] {
   const d = c2.center.distanceTo(c1.center)
-  if (d > c1.radius + c2.radius || d < Math.abs(c1.radius - c2.radius) || d === 0) return []
+  if (d > c1.radius + c2.radius || d < Math.abs(c1.radius - c2.radius) || d < EPSILON) return []
 
   const a = (c1.radius * c1.radius - c2.radius * c2.radius + d * d) / (2 * d)
   const h = Math.sqrt(c1.radius * c1.radius - a * a)
