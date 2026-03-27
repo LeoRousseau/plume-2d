@@ -14,7 +14,7 @@ describe('HitTest', () => {
   it('picks a filled circle', () => {
     const scene = new Scene()
     const c = new Circle(new Vector2(50, 50), 20)
-    c.fill = { color: '#f00' }
+    c.fill = { type: 'solid', color: '#f00' }
     scene.root.addChild(c)
 
     const hit = pick(scene, new Vector2(50, 50))
@@ -41,7 +41,7 @@ describe('HitTest', () => {
   it('picks a filled rectangle', () => {
     const scene = new Scene()
     const r = new Rectangle(new Vector2(10, 10), 40, 30)
-    r.fill = { color: '#0f0' }
+    r.fill = { type: 'solid', color: '#0f0' }
     scene.root.addChild(r)
 
     expect(pick(scene, new Vector2(30, 25))?.shape).toBe(r)
@@ -66,7 +66,7 @@ describe('HitTest', () => {
       new Vector2(0, 0), new Vector2(20, 0),
       new Vector2(20, 20), new Vector2(0, 20),
     ], true)
-    p.fill = { color: '#00f' }
+    p.fill = { type: 'solid', color: '#00f' }
     scene.root.addChild(p)
 
     expect(pick(scene, new Vector2(10, 10))?.shape).toBe(p)
@@ -85,7 +85,7 @@ describe('HitTest', () => {
   it('picks a filled ellipse', () => {
     const scene = new Scene()
     const e = new Ellipse(new Vector2(50, 50), 30, 20)
-    e.fill = { color: '#ff0' }
+    e.fill = { type: 'solid', color: '#ff0' }
     scene.root.addChild(e)
 
     expect(pick(scene, new Vector2(50, 50))?.shape).toBe(e)
@@ -111,7 +111,7 @@ describe('HitTest', () => {
       .lineTo(new Vector2(20, 20))
       .lineTo(new Vector2(0, 20))
       .close()
-    p.fill = { color: '#f0f' }
+    p.fill = { type: 'solid', color: '#f0f' }
     scene.root.addChild(p)
 
     expect(pick(scene, new Vector2(10, 10))?.shape).toBe(p)
@@ -121,9 +121,9 @@ describe('HitTest', () => {
   it('returns top-most shape when overlapping', () => {
     const scene = new Scene()
     const c1 = new Circle(new Vector2(50, 50), 30)
-    c1.fill = { color: '#f00' }
+    c1.fill = { type: 'solid', color: '#f00' }
     const c2 = new Circle(new Vector2(50, 50), 20)
-    c2.fill = { color: '#0f0' }
+    c2.fill = { type: 'solid', color: '#0f0' }
     scene.root.addChild(c1)
     scene.root.addChild(c2) // c2 is on top
 
@@ -144,7 +144,7 @@ describe('HitTest', () => {
   it('picks a shape with transform', () => {
     const scene = new Scene()
     const c = new Circle(new Vector2(0, 0), 20)
-    c.fill = { color: '#f00' }
+    c.fill = { type: 'solid', color: '#f00' }
     c.transform.position = new Vector2(100, 100)
     scene.root.addChild(c)
 
@@ -155,7 +155,7 @@ describe('HitTest', () => {
   it('returns null for non-invertible transform', () => {
     const scene = new Scene()
     const c = new Circle(new Vector2(0, 0), 20)
-    c.fill = { color: '#f00' }
+    c.fill = { type: 'solid', color: '#f00' }
     c.transform.scale = new Vector2(0, 0)
     scene.root.addChild(c)
 

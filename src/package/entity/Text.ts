@@ -16,7 +16,7 @@ export type TextBaseline = 'top' | 'middle' | 'alphabetic' | 'bottom'
  * @example
  * ```ts
  * const t = new Text('Hello', new Vector2(50, 100), 24, 'Arial')
- * t.fill = { color: '#fff' }
+ * t.fill = { type: 'solid', color: '#fff' }
  * t.textAlign = 'center'
  * ```
  */
@@ -48,7 +48,7 @@ export class Text extends AShape {
     this.textAlign = 'left'
     this.textBaseline = 'alphabetic'
     this.stroke = { color: '#ffffff', width: 0 }
-    this.fill = { color: '#ffffff' }
+    this.fill = { type: 'solid', color: '#ffffff' }
   }
 
   /** CSS font shorthand used for Canvas2D rendering. */

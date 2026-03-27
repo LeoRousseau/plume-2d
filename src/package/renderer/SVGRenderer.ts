@@ -19,6 +19,8 @@ export class SVGRenderer implements IRenderer {
   private height: number
   private elements: string[]
   private transformStack: string[]
+  private defs: string[]
+  private gradientIdCounter: number
   private _svg: string = ''
 
   constructor(width: number, height: number) {
@@ -26,6 +28,8 @@ export class SVGRenderer implements IRenderer {
     this.height = height
     this.elements = []
     this.transformStack = []
+    this.defs = []
+    this.gradientIdCounter = 0
   }
 
   get svg(): string {
@@ -35,6 +39,8 @@ export class SVGRenderer implements IRenderer {
   render(scene: Scene, view: View): void {
     this.elements = []
     this.transformStack = []
+    this.defs = []
+    this.gradientIdCounter = 0
 
     const offsetX = this.width / 2 - view.center.x * view.zoom
     const offsetY = this.height / 2 - view.center.y * view.zoom
@@ -44,11 +50,13 @@ export class SVGRenderer implements IRenderer {
 
     this.transformStack.pop()
 
-    this._svg = [
-      `<svg xmlns="http://www.w3.org/2000/svg" width="${this.width}" height="${this.height}">`,
-      ...this.elements,
-      '</svg>',
-    ].join('\n')
+    const parts = [`<svg xmlns="http://www.w3.org/2000/svg" width="${this.width}" height="${this.height}">`]
+    if (this.defs.length > 0) {
+      parts.push('  <defs>', ...this.defs, '  </defs>')
+    }
+    parts.push(...this.elements, '</svg>')
+
+    this._svg = parts.join('\n')
   }
 
   drawPolyline(polyline: Polyline): void {
@@ -150,6 +158,7 @@ export class SVGRenderer implements IRenderer {
 
   drawText(text: Text): void {
     const transform = this.transformStack.join(' ')
+    const fillAttr = this.resolveFillAttr(text.fill)
     const attrs: string[] = [
       `x="${text.position.x}"`,
       `y="${text.position.y}"`,
@@ -157,7 +166,7 @@ export class SVGRenderer implements IRenderer {
       `font-family="${text.fontFamily}"`,
       `text-anchor="${text.textAlign === 'center' ? 'middle' : text.textAlign === 'right' ? 'end' : 'start'}"`,
       `dominant-baseline="${text.textBaseline === 'middle' ? 'central' : text.textBaseline === 'top' ? 'hanging' : text.textBaseline === 'bottom' ? 'text-bottom' : 'auto'}"`,
-      `fill="${text.fill ? text.fill.color : 'none'}"`,
+      `fill="${fillAttr}"`,
     ]
     if (text.fill?.opacity !== undefined) attrs.push(`fill-opacity="${text.fill.opacity}"`)
     if (text.stroke.width > 0) {
@@ -178,11 +187,40 @@ export class SVGRenderer implements IRenderer {
     )
   }
 
+  private resolveFillAttr(fill: FillStyle | null): string {
+    if (!fill) return 'none'
+    switch (fill.type) {
+      case 'solid':
+        return fill.color
+      case 'linear-gradient': {
+        const id = `g${this.gradientIdCounter++}`
+        const stops = fill.stops.map(s => `    <stop offset="${s.offset}" stop-color="${s.color}" />`).join('\n')
+        this.defs.push(
+          `    <linearGradient id="${id}" x1="${fill.start.x}" y1="${fill.start.y}" x2="${fill.end.x}" y2="${fill.end.y}" gradientUnits="userSpaceOnUse">`,
+          stops,
+          `    </linearGradient>`,
+        )
+        return `url(#${id})`
+      }
+      case 'radial-gradient': {
+        const id = `g${this.gradientIdCounter++}`
+        const stops = fill.stops.map(s => `    <stop offset="${s.offset}" stop-color="${s.color}" />`).join('\n')
+        this.defs.push(
+          `    <radialGradient id="${id}" cx="${fill.center.x}" cy="${fill.center.y}" r="${fill.radius}" gradientUnits="userSpaceOnUse">`,
+          stops,
+          `    </radialGradient>`,
+        )
+        return `url(#${id})`
+      }
+    }
+  }
+
   private buildStyleAttrs(stroke: StrokeStyle, fill: FillStyle | null): string {
+    const fillAttr = this.resolveFillAttr(fill)
     const attrs: string[] = [
       `stroke="${stroke.color}"`,
       `stroke-width="${stroke.width}"`,
-      `fill="${fill ? fill.color : 'none'}"`,
+      `fill="${fillAttr}"`,
     ]
     if (stroke.dashArray) attrs.push(`stroke-dasharray="${stroke.dashArray.join(',')}"`)
     if (stroke.dashOffset !== undefined) attrs.push(`stroke-dashoffset="${stroke.dashOffset}"`)

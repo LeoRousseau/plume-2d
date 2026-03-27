@@ -24,7 +24,8 @@ describe('Text', () => {
     expect(t.fontFamily).toBe('sans-serif')
     expect(t.textAlign).toBe('left')
     expect(t.textBaseline).toBe('alphabetic')
-    expect(t.fill!.color).toBe('#ffffff')
+    expect(t.fill!.type).toBe('solid')
+    expect((t.fill as { color: string }).color).toBe('#ffffff')
     expect(t.stroke.width).toBe(0)
   })
 

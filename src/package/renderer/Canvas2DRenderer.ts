@@ -117,7 +117,7 @@ export class Canvas2DRenderer implements IRenderer {
     if (text.fill) {
       this.ctx.save()
       if (text.fill.opacity !== undefined) this.ctx.globalAlpha = text.fill.opacity
-      this.ctx.fillStyle = text.fill.color
+      this.ctx.fillStyle = this.resolveFillStyle(text.fill)
       this.ctx.fillText(text.content, text.position.x, text.position.y)
       this.ctx.restore()
     }
@@ -132,11 +132,28 @@ export class Canvas2DRenderer implements IRenderer {
     }
   }
 
+  private resolveFillStyle(fill: FillStyle): string | CanvasGradient {
+    switch (fill.type) {
+      case 'solid':
+        return fill.color
+      case 'linear-gradient': {
+        const g = this.ctx.createLinearGradient(fill.start.x, fill.start.y, fill.end.x, fill.end.y)
+        for (const s of fill.stops) g.addColorStop(s.offset, s.color)
+        return g
+      }
+      case 'radial-gradient': {
+        const g = this.ctx.createRadialGradient(fill.center.x, fill.center.y, 0, fill.center.x, fill.center.y, fill.radius)
+        for (const s of fill.stops) g.addColorStop(s.offset, s.color)
+        return g
+      }
+    }
+  }
+
   private applyFill(fill: FillStyle | null): void {
     if (fill) {
       this.ctx.save()
       if (fill.opacity !== undefined) this.ctx.globalAlpha = fill.opacity
-      this.ctx.fillStyle = fill.color
+      this.ctx.fillStyle = this.resolveFillStyle(fill)
       this.ctx.fill()
       this.ctx.restore()
     }

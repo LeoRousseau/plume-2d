@@ -198,7 +198,7 @@ input.onMouseMove = (scenePos) => {
 document.querySelector('#btn-circle')!.addEventListener('click', () => {
   const c = new Circle(new Vector2(randomX(), randomY()), 30 + Math.random() * 60)
   c.stroke = { color: randomColor(), width: 2 }
-  c.fill = { color: 'rgba(255,255,255,0.05)' }
+  c.fill = { type: 'solid', color: 'rgba(255,255,255,0.05)' }
   addShape(c)
   showInfo(`Circle r=${c.radius.toFixed(0)} area=${c.area().toFixed(1)} perim=${c.perimeter().toFixed(1)}`)
 })
@@ -208,7 +208,7 @@ document.querySelector('#btn-rect')!.addEventListener('click', () => {
   const h = 30 + Math.random() * 100
   const r = new Rectangle(new Vector2(randomX() - w/2, randomY() - h/2), w, h)
   r.stroke = { color: randomColor(), width: 2 }
-  r.fill = { color: 'rgba(255,255,255,0.05)' }
+  r.fill = { type: 'solid', color: 'rgba(255,255,255,0.05)' }
   addShape(r)
   showInfo(`Rect ${w.toFixed(0)}x${h.toFixed(0)} area=${r.area().toFixed(1)} perim=${r.perimeter().toFixed(1)}`)
 })
@@ -218,7 +218,7 @@ document.querySelector('#btn-ellipse')!.addEventListener('click', () => {
   const ry = 20 + Math.random() * 50
   const e = new Ellipse(new Vector2(randomX(), randomY()), rx, ry)
   e.stroke = { color: randomColor(), width: 2 }
-  e.fill = { color: 'rgba(255,255,255,0.05)' }
+  e.fill = { type: 'solid', color: 'rgba(255,255,255,0.05)' }
   addShape(e)
   showInfo(`Ellipse rx=${rx.toFixed(0)} ry=${ry.toFixed(0)} area=${e.area().toFixed(1)} perim=${e.perimeter().toFixed(1)}`)
 })
@@ -256,7 +256,7 @@ document.querySelector('#btn-text')!.addEventListener('click', () => {
   const sizes = [14, 18, 24, 32, 48]
   const size = sizes[Math.floor(Math.random() * sizes.length)]
   const t = new Text(label, new Vector2(randomX(), randomY()), size)
-  t.fill = { color: randomColor() }
+  t.fill = { type: 'solid', color: randomColor() }
   addShape(t)
   showInfo(`Text "${label}" ${size}px`)
 })
@@ -303,7 +303,7 @@ input.onDblClick = () => {
     const last = scene.root.children[scene.root.children.length - 1]
     if (last instanceof Polyline) {
       last.isClosed = true
-      last.fill = { color: 'rgba(0, 255, 255, 0.1)' }
+      last.fill = { type: 'solid', color: 'rgba(0, 255, 255, 0.1)' }
       delete (last as any)._drawing
       showInfo(`Polyline closed. area=${last.area().toFixed(1)} perim=${last.perimeter().toFixed(1)}`)
     }
@@ -333,9 +333,47 @@ document.querySelector('#btn-thick')!.addEventListener('click', () => {
 document.querySelector('#btn-opacity')!.addEventListener('click', () => {
   const c = new Circle(new Vector2(randomX(), randomY()), 50)
   c.stroke = { color: '#fff', width: 2, opacity: 0.3 }
-  c.fill = { color: '#e94560', opacity: 0.2 }
+  c.fill = { type: 'solid', color: '#e94560', opacity: 0.2 }
   addShape(c)
   showInfo('Circle with opacity on stroke (0.3) and fill (0.2)')
+})
+
+document.querySelector('#btn-linear-grad')!.addEventListener('click', () => {
+  const x = randomX(), y = randomY()
+  const w = 80 + Math.random() * 100, h = 60 + Math.random() * 80
+  const r = new Rectangle(new Vector2(x - w / 2, y - h / 2), w, h)
+  r.stroke = { color: '#fff', width: 1 }
+  r.fill = {
+    type: 'linear-gradient',
+    start: new Vector2(x - w / 2, y),
+    end: new Vector2(x + w / 2, y),
+    stops: [
+      { offset: 0, color: '#e94560' },
+      { offset: 0.5, color: '#0f3460' },
+      { offset: 1, color: '#0ff' },
+    ],
+  }
+  addShape(r)
+  showInfo('Rectangle with linear gradient fill')
+})
+
+document.querySelector('#btn-radial-grad')!.addEventListener('click', () => {
+  const x = randomX(), y = randomY()
+  const radius = 40 + Math.random() * 50
+  const c = new Circle(new Vector2(x, y), radius)
+  c.stroke = { color: '#fff', width: 1 }
+  c.fill = {
+    type: 'radial-gradient',
+    center: new Vector2(x, y),
+    radius,
+    stops: [
+      { offset: 0, color: '#fff' },
+      { offset: 0.4, color: '#e94560' },
+      { offset: 1, color: '#0f3460' },
+    ],
+  }
+  addShape(c)
+  showInfo('Circle with radial gradient fill')
 })
 
 // --- Buttons: Polyline tools ---
@@ -444,7 +482,7 @@ document.querySelector('#btn-line-circle')!.addEventListener('click', () => {
   const cx = randomX(), cy = randomY()
   const c = new Circle(new Vector2(cx, cy), 60)
   c.stroke = { color: '#0f0', width: 1 }
-  c.fill = { color: 'rgba(0,255,0,0.05)' }
+  c.fill = { type: 'solid', color: 'rgba(0,255,0,0.05)' }
 
   const l1 = new Vector2(cx - 150, cy - 30)
   const l2 = new Vector2(cx + 150, cy + 30)
@@ -472,10 +510,10 @@ document.querySelector('#btn-line-circle')!.addEventListener('click', () => {
 document.querySelector('#btn-circle-circle')!.addEventListener('click', () => {
   const c1 = new Circle(new Vector2(randomX(), randomY()), 50)
   c1.stroke = { color: '#0ff', width: 1 }
-  c1.fill = { color: 'rgba(0,255,255,0.05)' }
+  c1.fill = { type: 'solid', color: 'rgba(0,255,255,0.05)' }
   const c2 = new Circle(new Vector2(c1.center.x + 60, c1.center.y + 20), 50)
   c2.stroke = { color: '#f0f', width: 1 }
-  c2.fill = { color: 'rgba(255,0,255,0.05)' }
+  c2.fill = { type: 'solid', color: 'rgba(255,0,255,0.05)' }
 
   scene.root.addChild(c1)
   scene.root.addChild(c2)

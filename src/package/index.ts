@@ -21,7 +21,7 @@ export { Text } from './entity/Text'
 export type { TextAlign, TextBaseline } from './entity/Text'
 export type { PathSegment } from './entity/PathSegment'
 export type { StrokeStyle } from './entity/StrokeStyle'
-export type { FillStyle } from './entity/FillStyle'
+export type { FillStyle, SolidFill, LinearGradientFill, RadialGradientFill, GradientStop } from './entity/FillStyle'
 
 // Hit Testing
 export { hitTest, pick } from './hitTest/HitTest'

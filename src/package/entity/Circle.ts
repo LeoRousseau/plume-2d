@@ -10,7 +10,7 @@ import { AShape } from './Shape'
  * ```ts
  * const c = new Circle(new Vector2(100, 100), 50)
  * c.stroke = { color: '#0ff', width: 2 }
- * c.fill = { color: 'rgba(0,255,255,0.2)' }
+ * c.fill = { type: 'solid', color: 'rgba(0,255,255,0.2)' }
  * c.area()      // ~7854
  * c.perimeter()  // ~314
  * ```
