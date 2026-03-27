@@ -1,5 +1,5 @@
 import type { Scene } from '../core/Scene'
-import type { View } from './View'
+import type { View } from '../view/View'
 import type { AShape } from '../entity/Shape'
 import type { Polyline } from '../entity/Polyline'
 import type { Circle } from '../entity/Circle'

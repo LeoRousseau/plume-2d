@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { Ellipse } from './Ellipse'
 import { Vector2 } from '../math/Vector2'
-import type { IRenderer } from '../rendering/IRenderer'
+import type { IRenderer } from '../renderer/IRenderer'
 
 const mockRenderer: IRenderer = {
   render: vi.fn(),

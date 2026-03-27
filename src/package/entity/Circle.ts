@@ -1,6 +1,6 @@
 import { Vector2 } from '../math/Vector2'
 import { BoundingBox } from '../math/BoundingBox'
-import type { IRenderer } from '../rendering/IRenderer'
+import type { IRenderer } from '../renderer/IRenderer'
 import { AShape } from './Shape'
 
 /**

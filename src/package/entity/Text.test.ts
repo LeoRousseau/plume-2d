@@ -3,7 +3,7 @@ import { Text } from './Text'
 import { Vector2 } from '../math/Vector2'
 import { Scene } from '../core/Scene'
 import { pick } from '../hitTest/HitTest'
-import type { IRenderer } from '../rendering/IRenderer'
+import type { IRenderer } from '../renderer/IRenderer'
 
 const mockRenderer: IRenderer = {
   render: vi.fn(),

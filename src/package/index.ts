@@ -28,8 +28,8 @@ export { hitTest, pick } from './hitTest/HitTest'
 export type { HitTestResult } from './hitTest/HitTest'
 
 // Rendering
-export { View } from './rendering/View'
-export type { IRenderer } from './rendering/IRenderer'
+export { View } from './view/View'
+export type { IRenderer } from './renderer/IRenderer'
 
 // Renderers
 export { Canvas2DRenderer } from './renderer/Canvas2DRenderer'

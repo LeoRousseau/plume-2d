@@ -1,7 +1,7 @@
 import { Vector2 } from '../math/Vector2'
 import { BoundingBox } from '../math/BoundingBox'
 import { CURVE_SUBDIVISIONS } from '../math/constants'
-import type { IRenderer } from '../rendering/IRenderer'
+import type { IRenderer } from '../renderer/IRenderer'
 import { AShape } from './Shape'
 import type { PathSegment } from './PathSegment'
 import { distancePointToPathEdge } from '../geometry/distance'

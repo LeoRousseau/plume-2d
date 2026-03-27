@@ -1,5 +1,5 @@
 import { Node } from '../core/Node'
-import type { IRenderer } from '../rendering/IRenderer'
+import type { IRenderer } from '../renderer/IRenderer'
 import type { BoundingBox } from '../math/BoundingBox'
 import type { Vector2 } from '../math/Vector2'
 import type { StrokeStyle } from './StrokeStyle'

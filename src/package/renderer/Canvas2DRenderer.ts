@@ -1,6 +1,6 @@
 import { Node } from '../core/Node'
 import type { Scene } from '../core/Scene'
-import type { View } from '../rendering/View'
+import type { View } from '../view/View'
 import { TWO_PI } from '../math/constants'
 import { AShape } from '../entity/Shape'
 import type { Polyline } from '../entity/Polyline'
@@ -12,7 +12,7 @@ import type { Path } from '../entity/Path'
 import type { Text } from '../entity/Text'
 import type { StrokeStyle } from '../entity/StrokeStyle'
 import type { FillStyle, PatternFill } from '../entity/FillStyle'
-import type { IRenderer } from '../rendering/IRenderer'
+import type { IRenderer } from './IRenderer'
 
 export class Canvas2DRenderer implements IRenderer {
   private ctx: CanvasRenderingContext2D
