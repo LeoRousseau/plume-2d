@@ -212,7 +212,57 @@ export class SVGRenderer implements IRenderer {
         )
         return `url(#${id})`
       }
+      case 'pattern':
+        return this.createSvgPattern(fill)
     }
+  }
+
+  private createSvgPattern(fill: import('../entity/FillStyle').PatternFill): string {
+    const id = `p${this.gradientIdCounter++}`
+    const spacing = fill.spacing ?? 10
+    const size = fill.size ?? 1
+    const angle = fill.angle ?? (fill.pattern === 'hatch' || fill.pattern === 'crosshatch' ? Math.PI / 4 : 0)
+
+    const angleDeg = (angle * 180) / Math.PI
+    const transform = angle !== 0 ? ` patternTransform="rotate(${angleDeg})"` : ''
+
+    const children: string[] = []
+
+    if (fill.background) {
+      children.push(`      <rect width="${spacing}" height="${spacing}" fill="${fill.background}" />`)
+    }
+
+    switch (fill.pattern) {
+      case 'hatch':
+        children.push(
+          `      <line x1="0" y1="${spacing / 2}" x2="${spacing}" y2="${spacing / 2}" stroke="${fill.color}" stroke-width="${size}" />`,
+        )
+        break
+      case 'crosshatch':
+        children.push(
+          `      <line x1="0" y1="${spacing / 2}" x2="${spacing}" y2="${spacing / 2}" stroke="${fill.color}" stroke-width="${size}" />`,
+          `      <line x1="${spacing / 2}" y1="0" x2="${spacing / 2}" y2="${spacing}" stroke="${fill.color}" stroke-width="${size}" />`,
+        )
+        break
+      case 'dots':
+        children.push(
+          `      <circle cx="${spacing / 2}" cy="${spacing / 2}" r="${size}" fill="${fill.color}" />`,
+        )
+        break
+      case 'grid':
+        children.push(
+          `      <line x1="0" y1="${spacing / 2}" x2="${spacing}" y2="${spacing / 2}" stroke="${fill.color}" stroke-width="${size}" />`,
+          `      <line x1="${spacing / 2}" y1="0" x2="${spacing / 2}" y2="${spacing}" stroke="${fill.color}" stroke-width="${size}" />`,
+        )
+        break
+    }
+
+    this.defs.push(
+      `    <pattern id="${id}" width="${spacing}" height="${spacing}" patternUnits="userSpaceOnUse"${transform}>`,
+      ...children,
+      `    </pattern>`,
+    )
+    return `url(#${id})`
   }
 
   private buildStyleAttrs(stroke: StrokeStyle, fill: FillStyle | null): string {

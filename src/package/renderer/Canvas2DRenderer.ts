@@ -11,7 +11,7 @@ import type { Arc } from '../entity/Arc'
 import type { Path } from '../entity/Path'
 import type { Text } from '../entity/Text'
 import type { StrokeStyle } from '../entity/StrokeStyle'
-import type { FillStyle } from '../entity/FillStyle'
+import type { FillStyle, PatternFill } from '../entity/FillStyle'
 import type { IRenderer } from '../rendering/IRenderer'
 
 export class Canvas2DRenderer implements IRenderer {
@@ -132,7 +132,7 @@ export class Canvas2DRenderer implements IRenderer {
     }
   }
 
-  private resolveFillStyle(fill: FillStyle): string | CanvasGradient {
+  private resolveFillStyle(fill: FillStyle): string | CanvasGradient | CanvasPattern {
     switch (fill.type) {
       case 'solid':
         return fill.color
@@ -146,7 +146,81 @@ export class Canvas2DRenderer implements IRenderer {
         for (const s of fill.stops) g.addColorStop(s.offset, s.color)
         return g
       }
+      case 'pattern':
+        return this.createPatternFill(fill)
     }
+  }
+
+  private createPatternFill(fill: PatternFill): CanvasPattern {
+    const spacing = fill.spacing ?? 10
+    const size = fill.size ?? 1
+    const angle = fill.angle ?? (fill.pattern === 'hatch' || fill.pattern === 'crosshatch' ? Math.PI / 4 : 0)
+
+    // Render the tile at high resolution to stay sharp when zoomed
+    const dpr = window.devicePixelRatio || 1
+    const ctxTransform = this.ctx.getTransform()
+    const effectiveScale = Math.sqrt(ctxTransform.a * ctxTransform.a + ctxTransform.b * ctxTransform.b)
+    const res = Math.max(1, effectiveScale * dpr)
+    const s = Math.ceil(spacing * res)
+    const ratio = s / spacing  // actual pixel-to-user-unit ratio
+    const lw = size * ratio
+    const dotR = size * ratio
+
+    const offscreen = document.createElement('canvas')
+    offscreen.width = s
+    offscreen.height = s
+    const oc = offscreen.getContext('2d')!
+
+    if (fill.background) {
+      oc.fillStyle = fill.background
+      oc.fillRect(0, 0, s, s)
+    }
+
+    oc.strokeStyle = fill.color
+    oc.fillStyle = fill.color
+    oc.lineWidth = lw
+    oc.lineCap = 'square'
+
+    switch (fill.pattern) {
+      case 'hatch':
+        oc.beginPath()
+        oc.moveTo(0, s / 2)
+        oc.lineTo(s, s / 2)
+        oc.stroke()
+        break
+      case 'crosshatch':
+        oc.beginPath()
+        oc.moveTo(0, s / 2)
+        oc.lineTo(s, s / 2)
+        oc.moveTo(s / 2, 0)
+        oc.lineTo(s / 2, s)
+        oc.stroke()
+        break
+      case 'dots':
+        oc.beginPath()
+        oc.arc(s / 2, s / 2, dotR, 0, Math.PI * 2)
+        oc.fill()
+        break
+      case 'grid':
+        oc.beginPath()
+        oc.moveTo(0, s / 2)
+        oc.lineTo(s, s / 2)
+        oc.moveTo(s / 2, 0)
+        oc.lineTo(s / 2, s)
+        oc.stroke()
+        break
+    }
+
+    // Scale tile back to exactly `spacing` user-units
+    const inv = spacing / s
+    const m = new DOMMatrix().scaleSelf(inv, inv)
+    if (angle !== 0) {
+      m.rotateSelf((angle * 180) / Math.PI)
+    }
+
+    const pattern = this.ctx.createPattern(offscreen, 'repeat')!
+    pattern.setTransform(m)
+    return pattern
   }
 
   private applyFill(fill: FillStyle | null): void {

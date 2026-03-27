@@ -376,6 +376,25 @@ document.querySelector('#btn-radial-grad')!.addEventListener('click', () => {
   showInfo('Circle with radial gradient fill')
 })
 
+document.querySelector('#btn-pattern')!.addEventListener('click', () => {
+  const patterns: Array<'hatch' | 'crosshatch' | 'dots' | 'grid'> = ['hatch', 'crosshatch', 'dots', 'grid']
+  const pattern = patterns[Math.floor(Math.random() * patterns.length)]
+  const x = randomX(), y = randomY()
+  const w = 80 + Math.random() * 100, h = 60 + Math.random() * 80
+  const r = new Rectangle(new Vector2(x - w / 2, y - h / 2), w, h)
+  r.stroke = { color: '#fff', width: 1 }
+  r.fill = {
+    type: 'pattern',
+    pattern,
+    color: randomColor(),
+    background: 'rgba(0,0,0,0.3)',
+    spacing: 8 + Math.random() * 8,
+    size: pattern === 'dots' ? 2 : 1,
+  }
+  addShape(r)
+  showInfo(`Rectangle with "${pattern}" pattern fill`)
+})
+
 // --- Buttons: Polyline tools ---
 
 document.querySelector('#btn-simplify')!.addEventListener('click', () => {

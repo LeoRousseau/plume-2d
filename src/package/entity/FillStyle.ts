@@ -43,5 +43,24 @@ export interface RadialGradientFill {
   opacity?: number
 }
 
+/** Procedural geometric pattern fill. */
+export interface PatternFill {
+  type: 'pattern'
+  /** Pattern type. */
+  pattern: 'hatch' | 'crosshatch' | 'dots' | 'grid'
+  /** Pattern stroke/dot color (CSS color string). */
+  color: string
+  /** Background color, or `null` for transparent background. */
+  background: string | null
+  /** Spacing between pattern elements in pixels (default 10). */
+  spacing?: number
+  /** Rotation angle in radians (default `Math.PI / 4` for hatch/crosshatch, `0` otherwise). */
+  angle?: number
+  /** Line width or dot radius in pixels (default 1). */
+  size?: number
+  /** Fill opacity (0–1). */
+  opacity?: number
+}
+
 /** Describes how the interior of a shape is filled. */
-export type FillStyle = SolidFill | LinearGradientFill | RadialGradientFill
+export type FillStyle = SolidFill | LinearGradientFill | RadialGradientFill | PatternFill
