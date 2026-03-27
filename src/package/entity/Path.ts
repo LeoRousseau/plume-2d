@@ -115,6 +115,13 @@ export class Path extends AShape {
     return distancePointToPathEdge(p, this)
   }
 
+  toPath(): Path {
+    const p = new Path([...this.segments])
+    p.stroke = { ...this.stroke }
+    p.fill = this.fill ? { ...this.fill } : null
+    return p
+  }
+
   /**
    * Converts this path to an array of points by linearizing all curves.
    * @param steps - Number of subdivisions per curve segment (default 16).

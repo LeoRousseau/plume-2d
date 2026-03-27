@@ -1,6 +1,7 @@
 import { Node } from '../core/Node'
 import type { IRenderer } from '../renderer/IRenderer'
 import type { BoundingBox } from '../math/BoundingBox'
+import type { Path } from './Path'
 import type { Vector2 } from '../math/Vector2'
 import type { StrokeStyle } from './StrokeStyle'
 import type { FillStyle } from './FillStyle'
@@ -37,4 +38,6 @@ export abstract class AShape extends Node {
   abstract perimeter(): number
   /** Returns the shortest distance from `p` to the edge of this shape. */
   abstract distanceToEdge(p: Vector2): number
+  /** Converts this shape to an equivalent {@link Path}. Copies stroke and fill. */
+  abstract toPath(): Path
 }

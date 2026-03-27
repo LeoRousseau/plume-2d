@@ -2,6 +2,7 @@ import { Vector2 } from '../math/Vector2'
 import { BoundingBox } from '../math/BoundingBox'
 import type { IRenderer } from '../renderer/IRenderer'
 import { AShape } from './Shape'
+import { Path } from './Path'
 import { Polyline } from './Polyline'
 import { distancePointToRectEdge } from '../geometry/distance'
 
@@ -61,6 +62,19 @@ export class Rectangle extends AShape {
 
   distanceToEdge(p: Vector2): number {
     return distancePointToRectEdge(p, this)
+  }
+
+  toPath(): Path {
+    const { x, y } = this.origin
+    const p = new Path()
+      .moveTo(new Vector2(x, y))
+      .lineTo(new Vector2(x + this.width, y))
+      .lineTo(new Vector2(x + this.width, y + this.height))
+      .lineTo(new Vector2(x, y + this.height))
+      .close()
+    p.stroke = { ...this.stroke }
+    p.fill = this.fill ? { ...this.fill } : null
+    return p
   }
 
   /** Converts this rectangle to a closed 4-point {@link Polyline}. */

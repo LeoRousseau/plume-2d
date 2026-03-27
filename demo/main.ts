@@ -5,7 +5,8 @@ import {
   distancePointToPolyline, distancePointToCircle, closestPointOnPolyline,
   snap,
 } from '@plume/index'
-import type { AShape, HitTestResult } from '@plume/index'
+import { AShape } from '@plume/index'
+import type { HitTestResult } from '@plume/index'
 import { InputHandler } from './InputHandler'
 
 // --- Setup ---
@@ -393,6 +394,22 @@ document.querySelector('#btn-pattern')!.addEventListener('click', () => {
   }
   addShape(r)
   showInfo(`Rectangle with "${pattern}" pattern fill`)
+})
+
+// --- Convert ---
+
+document.querySelector('#btn-topath')!.addEventListener('click', () => {
+  const shapes = scene.root.children.filter((c): c is AShape => c instanceof AShape)
+  if (shapes.length === 0) { showInfo('No shapes to convert'); return }
+  const count = shapes.length
+  for (const shape of shapes) {
+    const path = shape.toPath()
+    path.transform = shape.transform
+    scene.root.addChild(path)
+    scene.root.removeChild(shape)
+  }
+  render()
+  showInfo(`Converted ${count} shape(s) to Path`)
 })
 
 // --- Buttons: Polyline tools ---

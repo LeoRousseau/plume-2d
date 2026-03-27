@@ -2,6 +2,7 @@ import { Vector2 } from '../math/Vector2'
 import { BoundingBox } from '../math/BoundingBox'
 import type { IRenderer } from '../renderer/IRenderer'
 import { AShape } from './Shape'
+import { Path } from './Path'
 import { distancePointToPolylineEdge } from '../geometry/distance'
 
 /**
@@ -130,6 +131,20 @@ export class Polyline extends AShape {
 
   distanceToEdge(p: Vector2): number {
     return distancePointToPolylineEdge(p, this)
+  }
+
+  toPath(): Path {
+    const p = new Path()
+    if (this.points.length > 0) {
+      p.moveTo(this.points[0])
+      for (let i = 1; i < this.points.length; i++) {
+        p.lineTo(this.points[i])
+      }
+      if (this.isClosed) p.close()
+    }
+    p.stroke = { ...this.stroke }
+    p.fill = this.fill ? { ...this.fill } : null
+    return p
   }
 
   /**

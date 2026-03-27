@@ -3,6 +3,7 @@ import { BoundingBox } from '../math/BoundingBox'
 import { TEXT_CHAR_WIDTH_RATIO, TEXT_ALPHABETIC_RATIO } from '../math/constants'
 import type { IRenderer } from '../renderer/IRenderer'
 import { AShape } from './Shape'
+import { Path } from './Path'
 
 /** Horizontal text alignment. */
 export type TextAlign = 'left' | 'center' | 'right'
@@ -110,5 +111,18 @@ export class Text extends AShape {
     const dx = p.x - cx
     const dy = p.y - cy
     return Math.sqrt(dx * dx + dy * dy)
+  }
+
+  toPath(): Path {
+    const bb = this.getBoundingBox()
+    const p = new Path()
+      .moveTo(new Vector2(bb.min.x, bb.min.y))
+      .lineTo(new Vector2(bb.max.x, bb.min.y))
+      .lineTo(new Vector2(bb.max.x, bb.max.y))
+      .lineTo(new Vector2(bb.min.x, bb.max.y))
+      .close()
+    p.stroke = { ...this.stroke }
+    p.fill = this.fill ? { ...this.fill } : null
+    return p
   }
 }

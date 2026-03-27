@@ -2,6 +2,7 @@ import { Vector2 } from '../math/Vector2'
 import { BoundingBox } from '../math/BoundingBox'
 import type { IRenderer } from '../renderer/IRenderer'
 import { AShape } from './Shape'
+import { Path } from './Path'
 
 /**
  * A circle defined by a center point and radius.
@@ -53,5 +54,20 @@ export class Circle extends AShape {
 
   distanceToEdge(p: Vector2): number {
     return Math.abs(p.distanceTo(this.center) - this.radius)
+  }
+
+  toPath(): Path {
+    const k = 0.5522847498 // 4/3 * (√2 - 1)
+    const cx = this.center.x, cy = this.center.y, r = this.radius
+    const p = new Path()
+      .moveTo(new Vector2(cx + r, cy))
+      .cubicTo(new Vector2(cx + r, cy + r * k), new Vector2(cx + r * k, cy + r), new Vector2(cx, cy + r))
+      .cubicTo(new Vector2(cx - r * k, cy + r), new Vector2(cx - r, cy + r * k), new Vector2(cx - r, cy))
+      .cubicTo(new Vector2(cx - r, cy - r * k), new Vector2(cx - r * k, cy - r), new Vector2(cx, cy - r))
+      .cubicTo(new Vector2(cx + r * k, cy - r), new Vector2(cx + r, cy - r * k), new Vector2(cx + r, cy))
+      .close()
+    p.stroke = { ...this.stroke }
+    p.fill = this.fill ? { ...this.fill } : null
+    return p
   }
 }

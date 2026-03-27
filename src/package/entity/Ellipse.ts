@@ -2,6 +2,7 @@ import { Vector2 } from '../math/Vector2'
 import { BoundingBox } from '../math/BoundingBox'
 import type { IRenderer } from '../renderer/IRenderer'
 import { AShape } from './Shape'
+import { Path } from './Path'
 
 /**
  * An axis-aligned ellipse defined by center and two radii.
@@ -63,5 +64,21 @@ export class Ellipse extends AShape {
     const dy = p.y - this.center.y
     const val = (dx * dx) / (this.rx * this.rx) + (dy * dy) / (this.ry * this.ry)
     return Math.abs(val - 1) * Math.min(this.rx, this.ry)
+  }
+
+  toPath(): Path {
+    const k = 0.5522847498
+    const cx = this.center.x, cy = this.center.y
+    const rx = this.rx, ry = this.ry
+    const p = new Path()
+      .moveTo(new Vector2(cx + rx, cy))
+      .cubicTo(new Vector2(cx + rx, cy + ry * k), new Vector2(cx + rx * k, cy + ry), new Vector2(cx, cy + ry))
+      .cubicTo(new Vector2(cx - rx * k, cy + ry), new Vector2(cx - rx, cy + ry * k), new Vector2(cx - rx, cy))
+      .cubicTo(new Vector2(cx - rx, cy - ry * k), new Vector2(cx - rx * k, cy - ry), new Vector2(cx, cy - ry))
+      .cubicTo(new Vector2(cx + rx * k, cy - ry), new Vector2(cx + rx, cy - ry * k), new Vector2(cx + rx, cy))
+      .close()
+    p.stroke = { ...this.stroke }
+    p.fill = this.fill ? { ...this.fill } : null
+    return p
   }
 }

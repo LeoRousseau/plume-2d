@@ -3,6 +3,7 @@ import { BoundingBox } from '../math/BoundingBox'
 import { TWO_PI, EPSILON } from '../math/constants'
 import type { IRenderer } from '../renderer/IRenderer'
 import { AShape } from './Shape'
+import { Path } from './Path'
 
 /**
  * A circular arc defined by center, radius, start angle and end angle (in radians).
@@ -101,6 +102,35 @@ export class Arc extends AShape {
       return Math.abs(dist - this.radius)
     }
     return Math.min(p.distanceTo(this.startPoint()), p.distanceTo(this.endPoint()))
+  }
+
+  toPath(): Path {
+    let sweep = this.endAngle - this.startAngle
+    if (sweep < 0) sweep += TWO_PI
+    const segments = Math.ceil(sweep / (Math.PI / 2))
+    const step = sweep / segments
+    const cx = this.center.x, cy = this.center.y, r = this.radius
+
+    const p = new Path()
+    p.moveTo(this.startPoint())
+
+    for (let i = 0; i < segments; i++) {
+      const a1 = this.startAngle + i * step
+      const a2 = a1 + step
+      const alpha = (4 / 3) * Math.tan(step / 4)
+
+      const cos1 = Math.cos(a1), sin1 = Math.sin(a1)
+      const cos2 = Math.cos(a2), sin2 = Math.sin(a2)
+
+      const cp1 = new Vector2(cx + r * (cos1 - alpha * sin1), cy + r * (sin1 + alpha * cos1))
+      const cp2 = new Vector2(cx + r * (cos2 + alpha * sin2), cy + r * (sin2 - alpha * cos2))
+      const end = new Vector2(cx + r * cos2, cy + r * sin2)
+      p.cubicTo(cp1, cp2, end)
+    }
+
+    p.stroke = { ...this.stroke }
+    p.fill = this.fill ? { ...this.fill } : null
+    return p
   }
 
   private containsAngle(angle: number): boolean {
