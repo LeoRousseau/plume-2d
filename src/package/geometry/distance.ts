@@ -101,5 +101,11 @@ export function distancePointToPathEdge(point: Vector2, path: Path, steps = CURV
     const d = distancePointToSegment(point, pts[i], pts[i + 1])
     if (d < minDist) minDist = d
   }
+  // Check closing segment if path ends with close
+  const last = path.segments[path.segments.length - 1]
+  if (last && last.type === 'close' && pts.length >= 2) {
+    const d = distancePointToSegment(point, pts[pts.length - 1], pts[0])
+    if (d < minDist) minDist = d
+  }
   return minDist
 }
