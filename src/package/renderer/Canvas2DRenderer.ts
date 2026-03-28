@@ -11,12 +11,17 @@ import type { Arc } from '../entity/Arc'
 import type { Path } from '../entity/Path'
 import type { Text } from '../entity/Text'
 import type { Raster } from '../entity/Raster'
+import type { SVGNode } from '../entity/SVGNode'
 import type { StrokeStyle } from '../entity/StrokeStyle'
 import type { FillStyle, PatternFill } from '../entity/FillStyle'
 import type { IRenderer } from './IRenderer'
 
 export class Canvas2DRenderer implements IRenderer {
   private ctx: CanvasRenderingContext2D
+  private currentZoom: number = 1
+
+  /** Called when an async resource (e.g. SVGNode) finishes loading and needs a re-render. */
+  onNeedRerender: (() => void) | null = null
 
   constructor(private canvas: HTMLCanvasElement) {
     const ctx = canvas.getContext('2d')
@@ -27,6 +32,7 @@ export class Canvas2DRenderer implements IRenderer {
   render(scene: Scene, view: View): void {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
 
+    this.currentZoom = view.zoom
     this.ctx.save()
 
     // Apply view transform: center + zoom
@@ -135,6 +141,53 @@ export class Canvas2DRenderer implements IRenderer {
 
   drawImage(image: Raster): void {
     this.ctx.drawImage(image.source, image.origin.x, image.origin.y, image.width, image.height)
+  }
+
+  drawSVGNode(svgNode: SVGNode): void {
+    const dpr = (typeof window !== 'undefined' ? window.devicePixelRatio : 1) || 1
+    const zoom = this.currentZoom
+    const neededZoom = Math.round(zoom * dpr * 10) / 10 // quantize to avoid thrashing
+
+    // Only start a new rasterization if zoom changed and none is in flight
+    if (svgNode._cacheZoom !== neededZoom && !svgNode._cachePending) {
+      const pw = Math.ceil(svgNode.width * neededZoom)
+      const ph = Math.ceil(svgNode.height * neededZoom)
+      const offscreen = document.createElement('canvas')
+      offscreen.width = pw
+      offscreen.height = ph
+
+      const blob = new Blob([svgNode.svg], { type: 'image/svg+xml;charset=utf-8' })
+      const url = URL.createObjectURL(blob)
+      const img = new Image()
+      img.src = url
+
+      svgNode._cachePending = true
+
+      img.onload = () => {
+        const oc = offscreen.getContext('2d')!
+        oc.drawImage(img, 0, 0, pw, ph)
+        URL.revokeObjectURL(url)
+        // Only now swap the cache — old one stays visible until this point
+        svgNode._cache = offscreen
+        svgNode._cacheZoom = neededZoom
+        svgNode._cachePending = false
+        if (this.onNeedRerender) this.onNeedRerender()
+      }
+
+      img.onerror = () => {
+        URL.revokeObjectURL(url)
+        svgNode._cachePending = false
+      }
+    }
+
+    // Draw from cache (old resolution is better than nothing)
+    if (svgNode._cache) {
+      this.ctx.drawImage(
+        svgNode._cache,
+        svgNode.origin.x, svgNode.origin.y,
+        svgNode.width, svgNode.height,
+      )
+    }
   }
 
   private resolveFillStyle(fill: FillStyle): string | CanvasGradient | CanvasPattern {

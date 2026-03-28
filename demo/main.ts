@@ -1,13 +1,14 @@
 import {
-  Vector2, Node, Scene, View, Polyline, Circle, Rectangle, Ellipse, Arc, Path, Text, Raster,
+  Vector2, Node, Scene, View, Polyline, Circle, Rectangle, Ellipse, Arc, Path, Text, Raster, SVGNode,
   Canvas2DRenderer, SVGRenderer, BoundingBox, hitTest,
   intersectLineLine, intersectLineCircle, intersectCircleCircle,
   distancePointToPolyline, distancePointToCircle, closestPointOnPolyline,
-  snap,
+  snap, parseSVG,
 } from '@plume/index'
 import { AShape } from '@plume/index'
 import type { HitTestResult } from '@plume/index'
 import { InputHandler } from './InputHandler'
+import plumeLogo from '../assets/icon.svg?raw'
 
 // --- Setup ---
 const canvasEl = document.querySelector<HTMLCanvasElement>('#plume-canvas')!
@@ -15,6 +16,7 @@ canvasEl.width = 900
 canvasEl.height = 650
 
 const renderer = new Canvas2DRenderer(canvasEl)
+renderer.onNeedRerender = () => render()
 const scene = new Scene()
 const view = new View(900, 650)
 const info = document.querySelector<HTMLDivElement>('#info')!
@@ -695,6 +697,34 @@ document.querySelector('#btn-clear')!.addEventListener('click', () => {
   showInfo('Scene cleared')
 })
 
+document.querySelector('#btn-import-svg')!.addEventListener('click', () => {
+  const input = document.createElement('input')
+  input.type = 'file'
+  input.accept = '.svg,image/svg+xml'
+  input.addEventListener('change', () => {
+    const file = input.files?.[0]
+    if (!file) return
+    const reader = new FileReader()
+    reader.onload = () => {
+      try {
+        const imported = parseSVG(reader.result as string)
+        let count = 0
+        for (const child of imported.root.children.slice()) {
+          imported.root.removeChild(child)
+          scene.root.addChild(child)
+          count++
+        }
+        render()
+        showInfo(`Imported ${count} element(s) from ${file.name}`)
+      } catch (e) {
+        showInfo(`SVG import error: ${(e as Error).message}`)
+      }
+    }
+    reader.readAsText(file)
+  })
+  input.click()
+})
+
 document.querySelector('#btn-svg')!.addEventListener('click', () => {
   const svgRenderer = new SVGRenderer(900, 650)
   svgRenderer.render(scene, view)
@@ -707,6 +737,11 @@ document.querySelector('#btn-svg')!.addEventListener('click', () => {
   URL.revokeObjectURL(url)
   showInfo('SVG exported')
 })
+
+// --- Load default logo (as SVGNode — rendered as a single crisp unit) ---
+const logoSize = 512 / 3
+const logo = new SVGNode(plumeLogo, new Vector2((900 - logoSize) / 2, (650 - logoSize) / 2), logoSize, logoSize)
+scene.root.addChild(logo)
 
 // --- Initial render ---
 render()

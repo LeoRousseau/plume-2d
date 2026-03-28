@@ -6,6 +6,7 @@ import { ARenderable } from '../entity/Renderable'
 import { AShape } from '../entity/Shape'
 import { Text } from '../entity/Text'
 import { Raster } from '../entity/Raster'
+import { SVGNode } from '../entity/SVGNode'
 
 /** Result returned by {@link hitTest} when a shape is hit. */
 export interface HitTestResult {
@@ -52,8 +53,8 @@ export function hitTest(node: Node, worldPoint: Vector2, tolerance: number = DEF
   if (!inv) return null
   const localPoint = inv.transformPoint(worldPoint)
 
-  // Text / Image: bounding box hit test only
-  if (node instanceof Text || node instanceof Raster) {
+  // Text / Image / SVGNode: bounding box hit test only
+  if (node instanceof Text || node instanceof Raster || node instanceof SVGNode) {
     const bb = node.getBoundingBox()
     if (bb.containsPoint(localPoint)) {
       return { shape: node, point: localPoint }

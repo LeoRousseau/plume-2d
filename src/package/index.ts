@@ -20,6 +20,7 @@ export { Arc } from './entity/Arc'
 export { Path } from './entity/Path'
 export { Text } from './entity/Text'
 export { Raster } from './entity/Raster'
+export { SVGNode } from './entity/SVGNode'
 export type { TextAlign, TextBaseline } from './entity/Text'
 export type { PathSegment } from './entity/PathSegment'
 export type { StrokeStyle } from './entity/StrokeStyle'
@@ -40,6 +41,9 @@ export { SVGRenderer } from './renderer/SVGRenderer'
 // Geometry utilities
 export { distancePointToLine, distancePointToPolyline, distancePointToCircle, distancePointToSegment, distancePointToPolylineEdge, distancePointToRectEdge, distancePointToPathEdge, closestPointOnLine, closestPointOnPolyline } from './geometry/distance'
 export { intersectLineLine, intersectLineCircle, intersectCircleCircle } from './geometry/intersect'
+
+// Parser
+export { parseSVG, parseSVGToNode, parsePathData } from './parser/SVGParser'
 
 // Snapping
 export { snap } from './snapping/Snap'

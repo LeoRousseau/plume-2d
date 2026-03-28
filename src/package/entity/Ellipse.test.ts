@@ -13,6 +13,7 @@ const mockRenderer: IRenderer = {
   drawPath: vi.fn(),
   drawText: vi.fn(),
   drawImage: vi.fn(),
+  drawSVGNode: vi.fn(),
 }
 
 describe('Ellipse', () => {

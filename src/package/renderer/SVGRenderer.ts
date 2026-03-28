@@ -11,6 +11,7 @@ import type { Arc } from '../entity/Arc'
 import type { Path } from '../entity/Path'
 import type { Text } from '../entity/Text'
 import type { Raster } from '../entity/Raster'
+import type { SVGNode } from '../entity/SVGNode'
 import type { StrokeStyle } from '../entity/StrokeStyle'
 import type { FillStyle } from '../entity/FillStyle'
 import type { IRenderer } from './IRenderer'
@@ -195,6 +196,17 @@ export class SVGRenderer implements IRenderer {
     this.elements.push(
       `  <g transform="${transform}">`,
       `    <image href="${href}" x="${image.origin.x}" y="${image.origin.y}" width="${image.width}" height="${image.height}" />`,
+      `  </g>`,
+    )
+  }
+
+  drawSVGNode(svgNode: SVGNode): void {
+    const transform = this.transformStack.join(' ')
+    const encoded = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgNode.svg)
+
+    this.elements.push(
+      `  <g transform="${transform}">`,
+      `    <image href="${encoded}" x="${svgNode.origin.x}" y="${svgNode.origin.y}" width="${svgNode.width}" height="${svgNode.height}" />`,
       `  </g>`,
     )
   }

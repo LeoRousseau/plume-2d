@@ -9,6 +9,7 @@ import type { Arc } from '../entity/Arc'
 import type { Path } from '../entity/Path'
 import type { Text } from '../entity/Text'
 import type { Raster } from '../entity/Raster'
+import type { SVGNode } from '../entity/SVGNode'
 
 /** Interface that all rendering backends must implement. */
 export interface IRenderer {
@@ -24,6 +25,7 @@ export interface IRenderer {
   drawPath(path: Path): void
   drawText(text: Text): void
   drawImage(image: Raster): void
+  drawSVGNode(svgNode: SVGNode): void
 
   /**
    * Fallback renderer for custom shapes not covered by the specific `draw*` methods.
