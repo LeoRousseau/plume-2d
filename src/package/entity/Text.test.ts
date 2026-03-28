@@ -14,6 +14,7 @@ const mockRenderer: IRenderer = {
   drawArc: vi.fn(),
   drawPath: vi.fn(),
   drawText: vi.fn(),
+  drawImage: vi.fn(),
 }
 
 describe('Text', () => {

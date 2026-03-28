@@ -10,6 +10,7 @@ import type { Ellipse } from '../entity/Ellipse'
 import type { Arc } from '../entity/Arc'
 import type { Path } from '../entity/Path'
 import type { Text } from '../entity/Text'
+import type { Raster } from '../entity/Raster'
 import type { StrokeStyle } from '../entity/StrokeStyle'
 import type { FillStyle } from '../entity/FillStyle'
 import type { IRenderer } from './IRenderer'
@@ -183,6 +184,17 @@ export class SVGRenderer implements IRenderer {
     this.elements.push(
       `  <g transform="${transform}">`,
       `    <text ${attrs.join(' ')}>${escaped}</text>`,
+      `  </g>`,
+    )
+  }
+
+  drawImage(image: Raster): void {
+    const transform = this.transformStack.join(' ')
+    const href = image.source.src
+
+    this.elements.push(
+      `  <g transform="${transform}">`,
+      `    <image href="${href}" x="${image.origin.x}" y="${image.origin.y}" width="${image.width}" height="${image.height}" />`,
       `  </g>`,
     )
   }

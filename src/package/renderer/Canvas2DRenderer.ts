@@ -10,6 +10,7 @@ import type { Ellipse } from '../entity/Ellipse'
 import type { Arc } from '../entity/Arc'
 import type { Path } from '../entity/Path'
 import type { Text } from '../entity/Text'
+import type { Raster } from '../entity/Raster'
 import type { StrokeStyle } from '../entity/StrokeStyle'
 import type { FillStyle, PatternFill } from '../entity/FillStyle'
 import type { IRenderer } from './IRenderer'
@@ -130,6 +131,10 @@ export class Canvas2DRenderer implements IRenderer {
       this.ctx.strokeText(text.content, text.position.x, text.position.y)
       this.ctx.restore()
     }
+  }
+
+  drawImage(image: Raster): void {
+    this.ctx.drawImage(image.source, image.origin.x, image.origin.y, image.width, image.height)
   }
 
   private resolveFillStyle(fill: FillStyle): string | CanvasGradient | CanvasPattern {

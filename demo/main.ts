@@ -1,5 +1,5 @@
 import {
-  Vector2, Node, Scene, View, Polyline, Circle, Rectangle, Ellipse, Arc, Path, Text,
+  Vector2, Node, Scene, View, Polyline, Circle, Rectangle, Ellipse, Arc, Path, Text, Raster,
   Canvas2DRenderer, SVGRenderer, BoundingBox, hitTest,
   intersectLineLine, intersectLineCircle, intersectCircleCircle,
   distancePointToPolyline, distancePointToCircle, closestPointOnPolyline,
@@ -260,6 +260,32 @@ document.querySelector('#btn-text')!.addEventListener('click', () => {
   t.fill = { type: 'solid', color: randomColor() }
   addShape(t)
   showInfo(`Text "${label}" ${size}px`)
+})
+
+document.querySelector('#btn-raster')!.addEventListener('click', () => {
+  const w = 80 + Math.random() * 120
+  const h = 60 + Math.random() * 90
+  // Generate a procedural image (checkerboard) as demo source
+  const offscreen = document.createElement('canvas')
+  offscreen.width = w
+  offscreen.height = h
+  const oc = offscreen.getContext('2d')!
+  const tileSize = 10
+  const color1 = randomColor()
+  const color2 = 'rgba(0,0,0,0.3)'
+  for (let y = 0; y < h; y += tileSize) {
+    for (let x = 0; x < w; x += tileSize) {
+      oc.fillStyle = ((x + y) / tileSize) % 2 < 1 ? color1 : color2
+      oc.fillRect(x, y, tileSize, tileSize)
+    }
+  }
+  const img = new Image()
+  img.src = offscreen.toDataURL()
+  img.onload = () => {
+    const raster = new Raster(img, new Vector2(randomX() - w / 2, randomY() - h / 2), w, h)
+    addShape(raster)
+    showInfo(`Raster ${w.toFixed(0)}×${h.toFixed(0)} (checkerboard)`)
+  }
 })
 
 // --- Polyline draw mode ---
