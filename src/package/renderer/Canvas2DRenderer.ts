@@ -254,6 +254,7 @@ export class Canvas2DRenderer implements IRenderer {
   }
 
   private renderNode(node: Node): void {
+    if (!node.visible) return
     this.ctx.save()
     this.applyTransform(node)
 

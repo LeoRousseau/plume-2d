@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { Vector2 } from '../math/Vector2'
+import { Node } from '../core/Node'
 import { Scene } from '../core/Scene'
 import { Polyline } from '../entity/Polyline'
 import { Circle } from '../entity/Circle'
@@ -165,6 +166,31 @@ describe('HitTest', () => {
   it('returns null on empty scene', () => {
     const scene = new Scene()
 
+    expect(pick(scene, new Vector2(50, 50))).toBeNull()
+  })
+
+  it('skips invisible nodes', () => {
+    const scene = new Scene()
+    const c = new Circle(new Vector2(50, 50), 20)
+    c.fill = { type: 'solid', color: '#f00' }
+    scene.root.addChild(c)
+
+    c.visible = false
+    expect(pick(scene, new Vector2(50, 50))).toBeNull()
+
+    c.visible = true
+    expect(pick(scene, new Vector2(50, 50))?.shape).toBe(c)
+  })
+
+  it('skips children of invisible parent', () => {
+    const scene = new Scene()
+    const group = new Node()
+    const c = new Circle(new Vector2(50, 50), 20)
+    c.fill = { type: 'solid', color: '#f00' }
+    group.addChild(c)
+    scene.root.addChild(group)
+
+    group.visible = false
     expect(pick(scene, new Vector2(50, 50))).toBeNull()
   })
 })

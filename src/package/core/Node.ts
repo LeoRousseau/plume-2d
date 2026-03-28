@@ -12,6 +12,8 @@ export class Node {
   children: Node[]
   /** Parent node, or `null` if this is a root. */
   parent: Node | null = null
+  /** Whether this node and its subtree are traversed during rendering and hit testing. */
+  visible: boolean = true
 
   constructor() {
     this.id = Node.nextId++

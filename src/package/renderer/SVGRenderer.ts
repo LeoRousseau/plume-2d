@@ -294,6 +294,7 @@ export class SVGRenderer implements IRenderer {
   }
 
   private renderNode(node: Node): void {
+    if (!node.visible) return
     const t = node.transform
     this.transformStack.push(
       `translate(${t.position.x},${t.position.y}) rotate(${(t.rotation * 180) / Math.PI}) scale(${t.scale.x},${t.scale.y})`,

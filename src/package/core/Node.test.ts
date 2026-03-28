@@ -189,6 +189,11 @@ describe('Node', () => {
     expect(parent.children).toEqual([a, b])
   })
 
+  it('visible defaults to true', () => {
+    const node = new Node()
+    expect(node.visible).toBe(true)
+  })
+
   it('bringToFront/sendToBack are no-ops without parent', () => {
     const node = new Node()
     expect(() => node.bringToFront()).not.toThrow()

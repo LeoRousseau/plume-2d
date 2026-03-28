@@ -41,6 +41,8 @@ export function pick(scene: Scene, worldPoint: Vector2, tolerance: number = DEFA
  * @returns The first hit result, or `null` if nothing was hit.
  */
 export function hitTest(node: Node, worldPoint: Vector2, tolerance: number = DEFAULT_HIT_TOLERANCE): HitTestResult | null {
+  if (!node.visible) return null
+
   for (let i = node.children.length - 1; i >= 0; i--) {
     const result = hitTest(node.children[i], worldPoint, tolerance)
     if (result) return result
