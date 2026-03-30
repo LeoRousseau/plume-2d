@@ -26,9 +26,52 @@ function getNodeIcon(node: Node): string {
   return '○'
 }
 
-export function createSceneTree(container: HTMLElement, scene: Scene): { refresh: () => void } {
+export interface SceneTree {
+  refresh: () => void
+  select: (node: Node | null) => void
+  selected: () => Node | null
+  onDelete: (() => void) | null
+}
+
+export function createSceneTree(container: HTMLElement, scene: Scene): SceneTree {
+  let selectedNode: Node | null = null
+
+  function select(node: Node | null): void {
+    selectedNode = node
+    refresh()
+  }
+
+  function selected(): Node | null {
+    return selectedNode
+  }
+
   function refresh(): void {
-    container.innerHTML = '<h3>Scene</h3>'
+    container.innerHTML = ''
+
+    const header = document.createElement('div')
+    header.className = 'scene-tree-header'
+    const h3 = document.createElement('h3')
+    h3.textContent = 'Scene'
+    header.appendChild(h3)
+
+    if (selectedNode) {
+      const delBtn = document.createElement('button')
+      delBtn.className = 'tree-delete-btn'
+      delBtn.textContent = '🗑'
+      delBtn.title = 'Delete selected (Delete)'
+      delBtn.addEventListener('click', () => {
+        if (selectedNode) {
+          scene.root.removeChild(selectedNode)
+          selectedNode = null
+          tree.onDelete?.()
+          refresh()
+        }
+      })
+      header.appendChild(delBtn)
+    }
+
+    container.appendChild(header)
+
     const list = document.createElement('div')
     list.className = 'scene-tree-list'
     renderChildren(scene.root.children, list, 0)
@@ -40,7 +83,13 @@ export function createSceneTree(container: HTMLElement, scene: Scene): { refresh
       const node = children[i]
       const row = document.createElement('div')
       row.className = 'tree-row'
+      if (node === selectedNode) row.classList.add('selected')
       row.style.paddingLeft = `${depth * 12 + 4}px`
+
+      row.addEventListener('click', () => {
+        selectedNode = selectedNode === node ? null : node
+        refresh()
+      })
 
       const visible = node.visible
       const visBtn = document.createElement('span')
@@ -67,6 +116,7 @@ export function createSceneTree(container: HTMLElement, scene: Scene): { refresh
     }
   }
 
+  const tree: SceneTree = { refresh, select, selected, onDelete: null }
   refresh()
-  return { refresh }
+  return tree
 }

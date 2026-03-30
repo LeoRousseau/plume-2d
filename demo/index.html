@@ -184,7 +184,25 @@
         overflow: hidden;
         text-overflow: ellipsis;
       }
+      .scene-tree-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .tree-delete-btn {
+        background: rgba(255,60,60,0.1);
+        border: 1px solid rgba(255,60,60,0.2);
+        color: #e66;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 12px;
+        padding: 2px 7px;
+        transition: all 0.15s;
+      }
+      .tree-delete-btn:hover { background: rgba(255,60,60,0.25); }
+      .tree-row { cursor: pointer; }
       .tree-row:hover { background: rgba(255,255,255,0.04); }
+      .tree-row.selected { background: rgba(233,69,96,0.12); }
       .vis-toggle {
         cursor: default;
         font-size: 11px;

@@ -1,6 +1,7 @@
 import {
-  Vector2, Scene, View, Canvas2DRenderer, SVGRenderer, parseSVG,
+  Vector2, Scene, View, Canvas2DRenderer, SVGRenderer, parseSVG, hitTest,
 } from '@plume/index'
+import { AShape } from '@plume/index'
 import { InputHandler } from './InputHandler'
 import {
   createToolState, handleDrawStart, handleDrawMove, handleDrawEnd,
@@ -64,7 +65,16 @@ input.onMouseUp = (pos) => {
 }
 
 input.onClick = (pos) => {
-  if (toolState.activeTool === 'polyline') {
+  if (toolState.activeTool === 'select') {
+    const result = hitTest(scene.root, pos, 4 / view.zoom)
+    sceneTree.select(result ? result.shape : null)
+    render()
+    if (result) {
+      showInfo(`Selected: ${result.shape.constructor.name}`)
+    } else {
+      showInfo('Tool: select')
+    }
+  } else if (toolState.activeTool === 'polyline') {
     handlePolylineClick(pos, drawCtx)
     sceneTree.refresh()
   } else if (toolState.activeTool === 'text') {
@@ -114,6 +124,16 @@ for (const tb of toolButtons) {
 // Keyboard shortcuts
 document.addEventListener('keydown', (e) => {
   if (e.target instanceof HTMLInputElement || e.target instanceof HTMLSelectElement) return
+  if (e.key === 'Delete' || e.key === 'Backspace') {
+    const sel = sceneTree.selected()
+    if (sel) {
+      scene.root.removeChild(sel)
+      sceneTree.select(null)
+      render()
+      showInfo('Deleted')
+    }
+    return
+  }
   const map: Record<string, ToolType> = {
     v: 'select', c: 'circle', r: 'rectangle', e: 'ellipse',
     p: 'polyline', b: 'path', t: 'text',
@@ -121,6 +141,9 @@ document.addEventListener('keydown', (e) => {
   const tool = map[e.key.toLowerCase()]
   if (tool) setActiveTool(tool)
 })
+
+// Scene tree delete callback
+sceneTree.onDelete = () => { render() }
 
 // --- Action buttons ---
 document.getElementById('btn-clear')?.addEventListener('click', () => {
@@ -175,6 +198,24 @@ document.getElementById('btn-import-svg')?.addEventListener('click', () => {
 // --- Render ---
 function render(): void {
   renderer.render(scene, view)
+
+  // Draw selection overlay
+  const sel = sceneTree.selected()
+  if (sel && sel instanceof AShape) {
+    const ctx = canvasEl.getContext('2d')!
+    ctx.save()
+    const offsetX = canvasEl.width / 2 - view.center.x * view.zoom
+    const offsetY = canvasEl.height / 2 - view.center.y * view.zoom
+    ctx.translate(offsetX, offsetY)
+    ctx.scale(view.zoom, view.zoom)
+    const bb = sel.getBoundingBox()
+    ctx.strokeStyle = '#e94560'
+    ctx.lineWidth = 1.5 / view.zoom
+    ctx.setLineDash([5 / view.zoom, 3 / view.zoom])
+    ctx.strokeRect(bb.min.x, bb.min.y, bb.width, bb.height)
+    ctx.setLineDash([])
+    ctx.restore()
+  }
 }
 
 // --- Logo ---
