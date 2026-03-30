@@ -3,112 +3,207 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Plume 2D</title>
+    <title>Plume 2D — Editor Demo</title>
     <style>
       * { margin: 0; padding: 0; box-sizing: border-box; }
-      body { background: #1a1a2e; color: #eee; font-family: system-ui, sans-serif; display: flex; height: 100vh; }
-      canvas { border: 1px solid #333; cursor: crosshair; display: block; }
-      #sidebar {
-        width: 220px;
+      body {
+        background: #1a1a2e;
+        color: #ddd;
+        font-family: system-ui, sans-serif;
+        font-size: 13px;
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+        overflow: hidden;
+      }
+
+      /* --- Toolbar (top) --- */
+      #toolbar {
+        display: flex;
+        align-items: center;
+        gap: 2px;
+        padding: 6px 12px;
         background: #16213e;
-        padding: 12px;
+        border-bottom: 1px solid #333;
+        flex-shrink: 0;
+      }
+      #toolbar .sep {
+        width: 1px;
+        height: 24px;
+        background: #333;
+        margin: 0 6px;
+      }
+      #toolbar button {
+        padding: 5px 10px;
+        background: #0f3460;
+        color: #ddd;
+        border: 1px solid #1a4a80;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 13px;
+        transition: background 0.15s;
+      }
+      #toolbar button:hover { background: #1a4a80; }
+      #toolbar button.active { background: #e94560; border-color: #e94560; color: #fff; }
+      #toolbar button.danger { background: #533; border-color: #744; }
+      #toolbar button.danger:hover { background: #744; }
+
+      /* --- Main area --- */
+      #main {
+        display: flex;
+        flex: 1;
+        min-height: 0;
+      }
+
+      /* --- Style panel (left) --- */
+      #style-panel {
+        width: 200px;
+        background: #16213e;
+        border-right: 1px solid #333;
+        padding: 10px;
+        overflow-y: auto;
+        flex-shrink: 0;
         display: flex;
         flex-direction: column;
         gap: 6px;
-        overflow-y: auto;
-        flex-shrink: 0;
       }
-      #sidebar h3 {
+      #style-panel h3 {
         font-size: 11px;
         text-transform: uppercase;
         letter-spacing: 1px;
         color: #888;
         margin-top: 8px;
       }
-      #sidebar h3:first-child { margin-top: 0; }
-      #sidebar button {
-        padding: 7px 10px;
-        background: #0f3460;
-        color: #eee;
-        border: 1px solid #1a4a80;
-        border-radius: 4px;
-        cursor: pointer;
-        font-size: 13px;
-        text-align: left;
-        transition: background 0.15s;
-      }
-      #sidebar button:hover { background: #1a4a80; }
-      #sidebar button.active { background: #e94560; border-color: #e94560; }
-      #sidebar button.danger { background: #533; border-color: #744; }
-      #sidebar button.danger:hover { background: #744; }
-      #canvas-wrap { flex: 1; display: flex; align-items: center; justify-content: center; }
-      #info {
-        position: fixed;
-        bottom: 12px;
-        right: 12px;
-        background: rgba(0,0,0,0.7);
-        padding: 8px 12px;
-        border-radius: 6px;
+      #style-panel h3:first-child { margin-top: 0; }
+      #style-panel label {
+        display: flex;
+        align-items: center;
+        gap: 6px;
         font-size: 12px;
+        color: #aaa;
+      }
+      #style-panel input[type="color"] {
+        width: 28px;
+        height: 22px;
+        border: 1px solid #555;
+        border-radius: 3px;
+        background: none;
+        cursor: pointer;
+      }
+      #style-panel input[type="range"] {
+        flex: 1;
+        max-width: 80px;
+      }
+      #style-panel select {
+        background: #0f3460;
+        color: #ddd;
+        border: 1px solid #1a4a80;
+        border-radius: 3px;
+        padding: 2px 4px;
+        font-size: 12px;
+      }
+      #style-panel input[type="checkbox"] {
+        accent-color: #e94560;
+      }
+
+      /* --- Canvas area (center) --- */
+      #canvas-wrap {
+        flex: 1;
+        display: flex;
+        align-items: stretch;
+        justify-content: stretch;
+        position: relative;
+        min-width: 0;
+      }
+      canvas {
+        width: 100%;
+        height: 100%;
+        display: block;
+        cursor: crosshair;
+      }
+      #info {
+        position: absolute;
+        bottom: 8px;
+        right: 8px;
+        background: rgba(0,0,0,0.7);
+        padding: 6px 10px;
+        border-radius: 5px;
+        font-size: 11px;
         font-family: monospace;
-        max-width: 400px;
+        max-width: 350px;
         white-space: pre-wrap;
+        pointer-events: none;
+      }
+
+      /* --- Scene tree (right) --- */
+      #scene-tree {
+        width: 220px;
+        background: #16213e;
+        border-left: 1px solid #333;
+        padding: 10px;
+        overflow-y: auto;
+        flex-shrink: 0;
+      }
+      #scene-tree h3 {
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: #888;
+        margin-bottom: 6px;
+      }
+      .tree-row {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        padding: 3px 4px;
+        border-radius: 3px;
+        font-size: 12px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .tree-row:hover { background: rgba(255,255,255,0.05); }
+      .vis-toggle {
+        cursor: default;
+        font-size: 11px;
+        opacity: 0.6;
+        min-width: 16px;
+        text-align: center;
+      }
+      .tree-icon {
+        min-width: 16px;
+        text-align: center;
+        opacity: 0.7;
+      }
+      .tree-label {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        color: #ccc;
       }
     </style>
   </head>
   <body>
-    <div id="sidebar">
-      <h3>Primitives</h3>
-      <button id="btn-circle">Circle</button>
-      <button id="btn-rect">Rectangle</button>
-      <button id="btn-ellipse">Ellipse</button>
-      <button id="btn-arc">Arc</button>
-      <button id="btn-path">Path (bezier)</button>
-      <button id="btn-text">Text</button>
-      <button id="btn-polyline">Polyline (click)</button>
-      <button id="btn-raster">Raster (image)</button>
-
-      <h3>Styles</h3>
-      <button id="btn-dashed">Dashed stroke</button>
-      <button id="btn-thick">Thick + round caps</button>
-      <button id="btn-opacity">Semi-transparent</button>
-      <button id="btn-linear-grad">Linear gradient</button>
-      <button id="btn-radial-grad">Radial gradient</button>
-      <button id="btn-pattern">Pattern fill</button>
-
-      <h3>Convert</h3>
-      <button id="btn-topath">All to Path</button>
-
-      <h3>Polyline tools</h3>
-      <button id="btn-simplify">Simplify (DP)</button>
-      <button id="btn-reverse">Reverse last</button>
-      <button id="btn-bbox">Show BoundingBoxes</button>
-      <button id="btn-centroid">Show centroids</button>
-
-      <h3>Geometry</h3>
-      <button id="btn-intersect">Line-Line intersect</button>
-      <button id="btn-line-circle">Line-Circle intersect</button>
-      <button id="btn-circle-circle">Circle-Circle intersect</button>
-      <button id="btn-distance">Distance to shape</button>
-
-      <h3>HitTest</h3>
-      <button id="btn-hittest">Toggle HitTest</button>
-
-      <h3>Snap</h3>
-      <button id="btn-snap">Toggle snap (draw)</button>
-      <button id="btn-snap-visual">Toggle snap visual</button>
-
-      <h3>Import / Export</h3>
-      <button id="btn-import-svg">Import SVG</button>
-      <button id="btn-svg">Download SVG</button>
-
-      <h3>Scene</h3>
-      <button id="btn-clear" class="danger">Clear all</button>
+    <div id="toolbar">
+      <button id="tool-select" class="active" title="Select (V)">▹ Select</button>
+      <button id="tool-circle" title="Circle (C)">● Circle</button>
+      <button id="tool-rect" title="Rectangle (R)">■ Rect</button>
+      <button id="tool-ellipse" title="Ellipse (E)">⬮ Ellipse</button>
+      <button id="tool-polyline" title="Polyline (P)">⏤ Polyline</button>
+      <button id="tool-path" title="Path (B)">∿ Path</button>
+      <button id="tool-text" title="Text (T)">T Text</button>
+      <div class="sep"></div>
+      <button id="btn-clear" class="danger" title="Clear scene">Clear</button>
+      <button id="btn-export-svg" title="Export SVG">Export SVG</button>
+      <button id="btn-import-svg" title="Import SVG">Import SVG</button>
     </div>
-    <div id="canvas-wrap">
-      <canvas id="plume-canvas"></canvas>
+    <div id="main">
+      <div id="style-panel"></div>
+      <div id="canvas-wrap">
+        <canvas id="plume-canvas"></canvas>
+        <div id="info"></div>
+      </div>
+      <div id="scene-tree"></div>
     </div>
-    <div id="info"></div>
     <script type="module" src="./main.ts"></script>
   </body>
 </html>
