@@ -10,17 +10,24 @@ export class InputHandler {
   private lastPanX = 0
   private lastPanY = 0
 
+  // drag state
+  private isDragging = false
+  private dragButton = -1
+  private dragStartScreen: { x: number; y: number } = { x: 0, y: 0 }
+
   // public callbacks
   onClick: ((scenePos: Vector2) => void) | null = null
   onDblClick: ((scenePos: Vector2) => void) | null = null
   onMouseMove: ((scenePos: Vector2) => void) | null = null
+  onMouseDown: ((scenePos: Vector2) => void) | null = null
+  onMouseUp: ((scenePos: Vector2) => void) | null = null
+  onDrag: ((scenePos: Vector2) => void) | null = null
 
   // bound handlers (for dispose)
   private handleWheel: (e: WheelEvent) => void
   private handlePointerDown: (e: PointerEvent) => void
   private handlePointerMove: (e: PointerEvent) => void
   private handlePointerUp: (e: PointerEvent) => void
-  private handleClick: (e: MouseEvent) => void
   private handleDblClick: (e: MouseEvent) => void
   private handleMouseMove: (e: MouseEvent) => void
 
@@ -54,30 +61,47 @@ export class InputHandler {
         this.lastPanY = e.clientY
         this.canvas.setPointerCapture(e.pointerId)
         e.preventDefault()
+      } else if (e.button === 0) {
+        this.isDragging = true
+        this.dragButton = 0
+        this.dragStartScreen = { x: e.clientX, y: e.clientY }
+        this.canvas.setPointerCapture(e.pointerId)
+        this.onMouseDown?.(this.screenToScene(e.clientX, e.clientY))
       }
     }
 
     this.handlePointerMove = (e: PointerEvent) => {
-      if (!this.isPanning) return
-      const dx = e.clientX - this.lastPanX
-      const dy = e.clientY - this.lastPanY
-      this.view.center = new Vector2(
-        this.view.center.x - dx / this.view.zoom,
-        this.view.center.y - dy / this.view.zoom,
-      )
-      this.lastPanX = e.clientX
-      this.lastPanY = e.clientY
-      this.onUpdate()
+      if (this.isPanning) {
+        const dx = e.clientX - this.lastPanX
+        const dy = e.clientY - this.lastPanY
+        this.view.center = new Vector2(
+          this.view.center.x - dx / this.view.zoom,
+          this.view.center.y - dy / this.view.zoom,
+        )
+        this.lastPanX = e.clientX
+        this.lastPanY = e.clientY
+        this.onUpdate()
+      } else if (this.isDragging) {
+        this.onDrag?.(this.screenToScene(e.clientX, e.clientY))
+      }
+      this.onMouseMove?.(this.screenToScene(e.clientX, e.clientY))
     }
 
     this.handlePointerUp = (e: PointerEvent) => {
       if (e.button === 1) {
         this.isPanning = false
+      } else if (e.button === 0 && this.isDragging) {
+        this.isDragging = false
+        this.dragButton = -1
+        const scenePos = this.screenToScene(e.clientX, e.clientY)
+        this.onMouseUp?.(scenePos)
+        // Fire onClick only if drag distance was negligible (click, not drag)
+        const dx = e.clientX - this.dragStartScreen.x
+        const dy = e.clientY - this.dragStartScreen.y
+        if (Math.sqrt(dx * dx + dy * dy) < 3) {
+          this.onClick?.(scenePos)
+        }
       }
-    }
-
-    this.handleClick = (e: MouseEvent) => {
-      this.onClick?.(this.screenToScene(e.clientX, e.clientY))
     }
 
     this.handleDblClick = (e: MouseEvent) => {
@@ -92,7 +116,6 @@ export class InputHandler {
     this.canvas.addEventListener('pointerdown', this.handlePointerDown)
     this.canvas.addEventListener('pointermove', this.handlePointerMove)
     this.canvas.addEventListener('pointerup', this.handlePointerUp)
-    this.canvas.addEventListener('click', this.handleClick)
     this.canvas.addEventListener('dblclick', this.handleDblClick)
     this.canvas.addEventListener('mousemove', this.handleMouseMove)
   }
@@ -112,7 +135,6 @@ export class InputHandler {
     this.canvas.removeEventListener('pointerdown', this.handlePointerDown)
     this.canvas.removeEventListener('pointermove', this.handlePointerMove)
     this.canvas.removeEventListener('pointerup', this.handlePointerUp)
-    this.canvas.removeEventListener('click', this.handleClick)
     this.canvas.removeEventListener('dblclick', this.handleDblClick)
     this.canvas.removeEventListener('mousemove', this.handleMouseMove)
   }
