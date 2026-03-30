@@ -126,6 +126,36 @@ export function handlePolylineDblClick(ctx: DrawContext): void {
 }
 
 // ---------------------------------------------------------------------------
+// Part 3b: Path click-based tool
+// ---------------------------------------------------------------------------
+
+let pathBuilder: Path | null = null
+let pathLastPoint: Vector2 | null = null
+
+export function handlePathClick(pos: Vector2, ctx: DrawContext): void {
+  if (ctx.toolState.activeTool !== 'path') return
+  if (!pathBuilder) {
+    pathBuilder = new Path()
+    pathBuilder.moveTo(pos)
+    pathBuilder.stroke = { ...ctx.toolState.stroke }
+    pathBuilder.fill = ctx.toolState.fill ? { ...ctx.toolState.fill } : null
+    ctx.scene.root.addChild(pathBuilder)
+    pathLastPoint = pos
+  } else {
+    pathBuilder.lineTo(pos)
+    pathLastPoint = pos
+  }
+  ctx.render()
+}
+
+export function handlePathDblClick(ctx: DrawContext): void {
+  if (ctx.toolState.activeTool !== 'path') return
+  pathBuilder = null
+  pathLastPoint = null
+  ctx.render()
+}
+
+// ---------------------------------------------------------------------------
 // Part 4: Text click tool
 // ---------------------------------------------------------------------------
 
@@ -155,4 +185,6 @@ export function cancelDraw(ctx: DrawContext): void {
   }
   polylinePreview = null
   polylinePoints = []
+  pathBuilder = null
+  pathLastPoint = null
 }
