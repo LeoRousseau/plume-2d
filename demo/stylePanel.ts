@@ -1,3 +1,4 @@
+import { Vector2 } from '@plume/index'
 import type { ToolState } from './tools'
 
 export function createStylePanel(container: HTMLElement, toolState: ToolState): void {
@@ -31,6 +32,8 @@ export function createStylePanel(container: HTMLElement, toolState: ToolState): 
     <label>Type
       <select id="fill-type">
         <option value="solid">Solid</option>
+        <option value="linear-gradient">Linear gradient</option>
+        <option value="radial-gradient">Radial gradient</option>
         <option value="pattern">Pattern</option>
       </select>
     </label>
@@ -38,6 +41,10 @@ export function createStylePanel(container: HTMLElement, toolState: ToolState): 
     <label>Opacity <input type="range" id="fill-opacity" min="0" max="1" step="0.05" value="0.1">
       <span id="fill-opacity-val">0.1</span>
     </label>
+    <div id="gradient-options" style="display:none">
+      <label>Color 2 <input type="color" id="fill-color2" value="#e94560"></label>
+      <label>Color 3 <input type="color" id="fill-color3" value="#0ff"></label>
+    </div>
     <div id="pattern-options" style="display:none">
       <label>Pattern
         <select id="fill-pattern">
@@ -87,10 +94,40 @@ export function createStylePanel(container: HTMLElement, toolState: ToolState): 
     container.querySelector('#fill-opacity-val')!.textContent = String(opacity)
 
     const patternOpts = container.querySelector('#pattern-options') as HTMLElement
+    const gradientOpts = container.querySelector('#gradient-options') as HTMLElement
     patternOpts.style.display = fillType === 'pattern' ? 'block' : 'none'
+    gradientOpts.style.display = (fillType === 'linear-gradient' || fillType === 'radial-gradient') ? 'block' : 'none'
 
     if (fillType === 'solid') {
       toolState.fill = { type: 'solid', color, opacity }
+    } else if (fillType === 'linear-gradient') {
+      const color2 = (container.querySelector('#fill-color2') as HTMLInputElement).value
+      const color3 = (container.querySelector('#fill-color3') as HTMLInputElement).value
+      toolState.fill = {
+        type: 'linear-gradient',
+        start: new Vector2(0, 0),
+        end: new Vector2(1, 0),
+        stops: [
+          { offset: 0, color },
+          { offset: 0.5, color: color2 },
+          { offset: 1, color: color3 },
+        ],
+        opacity,
+      }
+    } else if (fillType === 'radial-gradient') {
+      const color2 = (container.querySelector('#fill-color2') as HTMLInputElement).value
+      const color3 = (container.querySelector('#fill-color3') as HTMLInputElement).value
+      toolState.fill = {
+        type: 'radial-gradient',
+        center: new Vector2(0.5, 0.5),
+        radius: 1,
+        stops: [
+          { offset: 0, color },
+          { offset: 0.5, color: color2 },
+          { offset: 1, color: color3 },
+        ],
+        opacity,
+      }
     } else if (fillType === 'pattern') {
       const pattern = (container.querySelector('#fill-pattern') as HTMLSelectElement).value as 'hatch' | 'crosshatch' | 'dots' | 'grid'
       toolState.fill = { type: 'pattern', pattern, color, background: null, spacing: 10, size: 2 }

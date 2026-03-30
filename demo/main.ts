@@ -11,6 +11,7 @@ import {
 import type { ToolType, DrawContext } from './tools'
 import { createStylePanel } from './stylePanel'
 import { createSceneTree } from './sceneTree'
+import plumeLogo from '../assets/icon.svg?raw'
 
 // --- Canvas setup (fill parent) ---
 const canvasEl = document.querySelector<HTMLCanvasElement>('#plume-canvas')!
@@ -175,6 +176,10 @@ document.getElementById('btn-import-svg')?.addEventListener('click', () => {
 function render(): void {
   renderer.render(scene, view)
 }
+
+// --- Logo ---
+const logoEl = document.getElementById('logo') as HTMLImageElement
+logoEl.src = `data:image/svg+xml,${encodeURIComponent(plumeLogo)}`
 
 // --- Initial ---
 render()

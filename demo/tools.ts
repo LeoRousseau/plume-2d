@@ -1,8 +1,8 @@
 import {
-  Vector2, Scene, Circle, Rectangle, Ellipse, Polyline, Path, Text,
+  Vector2, Scene, Circle, Rectangle, Ellipse, Polyline, Path, Text, BoundingBox,
 } from '@plume/index'
 import type { StrokeStyle, FillStyle } from '@plume/index'
-import { ARenderable } from '@plume/index'
+import { ARenderable, AShape } from '@plume/index'
 
 export type ToolType = 'select' | 'circle' | 'rectangle' | 'ellipse' | 'polyline' | 'path' | 'text'
 
@@ -24,6 +24,34 @@ export interface DrawContext {
   scene: Scene
   toolState: ToolState
   render: () => void
+}
+
+// ---------------------------------------------------------------------------
+// Fill resolution: map normalized gradient coords to shape bounding box
+// ---------------------------------------------------------------------------
+
+function resolveFill(fill: FillStyle | null, shape: AShape): FillStyle | null {
+  if (!fill) return null
+  if (fill.type === 'linear-gradient') {
+    const bb = shape.getBoundingBox()
+    return {
+      ...fill,
+      start: new Vector2(bb.min.x + fill.start.x * bb.width, bb.min.y + fill.start.y * bb.height),
+      end: new Vector2(bb.min.x + fill.end.x * bb.width, bb.min.y + fill.end.y * bb.height),
+    }
+  }
+  if (fill.type === 'radial-gradient') {
+    const bb = shape.getBoundingBox()
+    const cx = bb.min.x + fill.center.x * bb.width
+    const cy = bb.min.y + fill.center.y * bb.height
+    const r = fill.radius * Math.max(bb.width, bb.height) / 2
+    return {
+      ...fill,
+      center: new Vector2(cx, cy),
+      radius: r,
+    }
+  }
+  return { ...fill }
 }
 
 // ---------------------------------------------------------------------------
@@ -55,7 +83,7 @@ export function handleDrawMove(pos: Vector2, ctx: DrawContext): void {
     if (w < 2 && h < 2) return
     const r = new Rectangle(min, w, h)
     r.stroke = { ...stroke }
-    r.fill = fill ? { ...fill } : null
+    r.fill = resolveFill(fill, r)
     preview = r
   } else if (activeTool === 'circle') {
     const dx = pos.x - dragStart.x
@@ -64,7 +92,7 @@ export function handleDrawMove(pos: Vector2, ctx: DrawContext): void {
     if (radius < 2) return
     const c = new Circle(dragStart, radius)
     c.stroke = { ...stroke }
-    c.fill = fill ? { ...fill } : null
+    c.fill = resolveFill(fill, c)
     preview = c
   } else if (activeTool === 'ellipse') {
     const rx = Math.abs(pos.x - dragStart.x)
@@ -76,7 +104,7 @@ export function handleDrawMove(pos: Vector2, ctx: DrawContext): void {
     )
     const e = new Ellipse(center, rx / 2, ry / 2)
     e.stroke = { ...stroke }
-    e.fill = fill ? { ...fill } : null
+    e.fill = resolveFill(fill, e)
     preview = e
   }
 
@@ -118,7 +146,7 @@ export function handlePolylineDblClick(ctx: DrawContext): void {
   if (ctx.toolState.activeTool !== 'polyline') return
   if (polylinePoints.length >= 3 && polylinePreview) {
     polylinePreview.isClosed = true
-    polylinePreview.fill = ctx.toolState.fill ? { ...ctx.toolState.fill } : null
+    polylinePreview.fill = resolveFill(ctx.toolState.fill, polylinePreview)
   }
   polylinePreview = null
   polylinePoints = []

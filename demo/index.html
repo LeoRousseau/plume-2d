@@ -7,9 +7,9 @@
     <style>
       * { margin: 0; padding: 0; box-sizing: border-box; }
       body {
-        background: #1a1a2e;
-        color: #ddd;
-        font-family: system-ui, sans-serif;
+        background: #121620;
+        color: #c8cdd5;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
         font-size: 13px;
         display: flex;
         flex-direction: column;
@@ -21,32 +21,48 @@
       #toolbar {
         display: flex;
         align-items: center;
-        gap: 2px;
-        padding: 6px 12px;
-        background: #16213e;
-        border-bottom: 1px solid #333;
+        gap: 3px;
+        padding: 8px 14px;
+        background: #1a1f2e;
+        border-bottom: 1px solid rgba(255,255,255,0.06);
         flex-shrink: 0;
+      }
+      #toolbar #logo {
+        height: 32px;
+        filter: drop-shadow(0 0 4px rgba(233,69,96,0.3));
       }
       #toolbar .sep {
         width: 1px;
-        height: 24px;
-        background: #333;
-        margin: 0 6px;
+        height: 26px;
+        background: rgba(255,255,255,0.08);
+        margin: 0 8px;
       }
       #toolbar button {
-        padding: 5px 10px;
-        background: #0f3460;
-        color: #ddd;
-        border: 1px solid #1a4a80;
-        border-radius: 4px;
+        padding: 6px 12px;
+        background: rgba(255,255,255,0.05);
+        color: #9aa0ab;
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 6px;
         cursor: pointer;
         font-size: 13px;
-        transition: background 0.15s;
+        font-weight: 500;
+        transition: all 0.15s;
       }
-      #toolbar button:hover { background: #1a4a80; }
-      #toolbar button.active { background: #e94560; border-color: #e94560; color: #fff; }
-      #toolbar button.danger { background: #533; border-color: #744; }
-      #toolbar button.danger:hover { background: #744; }
+      #toolbar button:hover { background: rgba(255,255,255,0.1); color: #ddd; }
+      #toolbar button.active {
+        background: rgba(233,69,96,0.15);
+        border-color: rgba(233,69,96,0.4);
+        color: #e94560;
+      }
+      #toolbar button.danger {
+        background: rgba(255,60,60,0.08);
+        border-color: rgba(255,60,60,0.15);
+        color: #b55;
+      }
+      #toolbar button.danger:hover {
+        background: rgba(255,60,60,0.15);
+        color: #e66;
+      }
 
       /* --- Main area --- */
       #main {
@@ -58,9 +74,9 @@
       /* --- Style panel (left) --- */
       #style-panel {
         width: 200px;
-        background: #16213e;
-        border-right: 1px solid #333;
-        padding: 10px;
+        background: #1a1f2e;
+        border-right: 1px solid rgba(255,255,255,0.06);
+        padding: 12px;
         overflow-y: auto;
         flex-shrink: 0;
         display: flex;
@@ -68,11 +84,12 @@
         gap: 6px;
       }
       #style-panel h3 {
-        font-size: 11px;
+        font-size: 10px;
         text-transform: uppercase;
-        letter-spacing: 1px;
-        color: #888;
-        margin-top: 8px;
+        letter-spacing: 1.2px;
+        color: #5a6070;
+        margin-top: 10px;
+        font-weight: 600;
       }
       #style-panel h3:first-child { margin-top: 0; }
       #style-panel label {
@@ -80,26 +97,27 @@
         align-items: center;
         gap: 6px;
         font-size: 12px;
-        color: #aaa;
+        color: #8a90a0;
       }
       #style-panel input[type="color"] {
         width: 28px;
         height: 22px;
-        border: 1px solid #555;
-        border-radius: 3px;
+        border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 4px;
         background: none;
         cursor: pointer;
       }
       #style-panel input[type="range"] {
         flex: 1;
         max-width: 80px;
+        accent-color: #e94560;
       }
       #style-panel select {
-        background: #0f3460;
-        color: #ddd;
-        border: 1px solid #1a4a80;
-        border-radius: 3px;
-        padding: 2px 4px;
+        background: rgba(255,255,255,0.05);
+        color: #b0b5c0;
+        border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 4px;
+        padding: 3px 6px;
         font-size: 12px;
       }
       #style-panel input[type="checkbox"] {
@@ -114,6 +132,7 @@
         justify-content: stretch;
         position: relative;
         min-width: 0;
+        background: #0e1117;
       }
       canvas {
         width: 100%;
@@ -123,13 +142,15 @@
       }
       #info {
         position: absolute;
-        bottom: 8px;
-        right: 8px;
-        background: rgba(0,0,0,0.7);
+        bottom: 10px;
+        right: 10px;
+        background: rgba(15,17,23,0.85);
         padding: 6px 10px;
-        border-radius: 5px;
+        border-radius: 6px;
+        border: 1px solid rgba(255,255,255,0.06);
         font-size: 11px;
-        font-family: monospace;
+        font-family: 'SF Mono', 'Cascadia Code', 'Consolas', monospace;
+        color: #7a8090;
         max-width: 350px;
         white-space: pre-wrap;
         pointer-events: none;
@@ -138,52 +159,56 @@
       /* --- Scene tree (right) --- */
       #scene-tree {
         width: 220px;
-        background: #16213e;
-        border-left: 1px solid #333;
-        padding: 10px;
+        background: #1a1f2e;
+        border-left: 1px solid rgba(255,255,255,0.06);
+        padding: 12px;
         overflow-y: auto;
         flex-shrink: 0;
       }
       #scene-tree h3 {
-        font-size: 11px;
+        font-size: 10px;
         text-transform: uppercase;
-        letter-spacing: 1px;
-        color: #888;
-        margin-bottom: 6px;
+        letter-spacing: 1.2px;
+        color: #5a6070;
+        margin-bottom: 8px;
+        font-weight: 600;
       }
       .tree-row {
         display: flex;
         align-items: center;
-        gap: 4px;
-        padding: 3px 4px;
-        border-radius: 3px;
+        gap: 5px;
+        padding: 4px 6px;
+        border-radius: 4px;
         font-size: 12px;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
       }
-      .tree-row:hover { background: rgba(255,255,255,0.05); }
+      .tree-row:hover { background: rgba(255,255,255,0.04); }
       .vis-toggle {
         cursor: default;
         font-size: 11px;
-        opacity: 0.6;
+        opacity: 0.4;
         min-width: 16px;
         text-align: center;
       }
       .tree-icon {
         min-width: 16px;
         text-align: center;
-        opacity: 0.7;
+        opacity: 0.5;
+        color: #e94560;
       }
       .tree-label {
         overflow: hidden;
         text-overflow: ellipsis;
-        color: #ccc;
+        color: #8a90a0;
       }
     </style>
   </head>
   <body>
     <div id="toolbar">
+      <img id="logo" alt="Plume 2D" height="24">
+      <div class="sep"></div>
       <button id="tool-select" class="active" title="Select (V)">▹ Select</button>
       <button id="tool-circle" title="Circle (C)">● Circle</button>
       <button id="tool-rect" title="Rectangle (R)">■ Rect</button>
