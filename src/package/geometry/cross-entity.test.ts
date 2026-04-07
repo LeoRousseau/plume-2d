@@ -11,6 +11,7 @@ import {
   intersectLineCircle,
   intersectCircleCircle,
   intersectLineArc,
+  intersectLineEllipse,
 } from './intersect'
 import {
   distancePointToLine,
@@ -145,6 +146,53 @@ describe('intersect – Line × Arc (manual angle check)', () => {
     const pts = intersectLineCircle(new Vector2(-10, -3), new Vector2(10, -3), a)
     const inArc = pts.filter((p) => a.containsPoint(p, 0.5))
     expect(inArc).toHaveLength(0)
+  })
+})
+
+describe('intersectLineEllipse', () => {
+  it('horizontal line through ellipse center → 2 hits', () => {
+    const e = ellipse() // center (0,0), rx=6, ry=4
+    const pts = intersectLineEllipse(new Vector2(-10, 0), new Vector2(10, 0), e)
+    expect(pts).toHaveLength(2)
+    const xs = pts.map(p => p.x).sort((a, b) => a - b)
+    expect(xs[0]).toBeCloseTo(-6)
+    expect(xs[1]).toBeCloseTo(6)
+  })
+
+  it('vertical line through center → 2 hits', () => {
+    const e = ellipse()
+    const pts = intersectLineEllipse(new Vector2(0, -10), new Vector2(0, 10), e)
+    expect(pts).toHaveLength(2)
+    const ys = pts.map(p => p.y).sort((a, b) => a - b)
+    expect(ys[0]).toBeCloseTo(-4)
+    expect(ys[1]).toBeCloseTo(4)
+  })
+
+  it('tangent line → 1 hit', () => {
+    const e = ellipse()
+    const pts = intersectLineEllipse(new Vector2(-10, 4), new Vector2(10, 4), e)
+    expect(pts).toHaveLength(1)
+    expect(pts[0].x).toBeCloseTo(0)
+    expect(pts[0].y).toBeCloseTo(4)
+  })
+
+  it('miss → 0 hits', () => {
+    const e = ellipse()
+    const pts = intersectLineEllipse(new Vector2(-10, 10), new Vector2(10, 10), e)
+    expect(pts).toHaveLength(0)
+  })
+
+  it('segment ending inside ellipse → 1 hit', () => {
+    const e = ellipse()
+    const pts = intersectLineEllipse(new Vector2(0, 0), new Vector2(10, 0), e)
+    expect(pts).toHaveLength(1)
+    expect(pts[0].x).toBeCloseTo(6)
+  })
+
+  it('segment fully inside ellipse → 0 hits', () => {
+    const e = ellipse()
+    const pts = intersectLineEllipse(new Vector2(-1, 0), new Vector2(1, 0), e)
+    expect(pts).toHaveLength(0)
   })
 })
 

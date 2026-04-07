@@ -112,6 +112,43 @@ export function intersectLineArc(
   })
 }
 
+/**
+ * Finds intersection points between a line segment and an axis-aligned ellipse.
+ * Uses quadratic resolution in normalized ellipse space.
+ * Returns 0, 1, or 2 points.
+ */
+export function intersectLineEllipse(
+  lineStart: Vector2, lineEnd: Vector2,
+  ellipse: { center: Vector2; rx: number; ry: number },
+): Vector2[] {
+  const dx = lineEnd.x - lineStart.x
+  const dy = lineEnd.y - lineStart.y
+  const fx = lineStart.x - ellipse.center.x
+  const fy = lineStart.y - ellipse.center.y
+  const rx2 = ellipse.rx * ellipse.rx
+  const ry2 = ellipse.ry * ellipse.ry
+
+  const a = (dx * dx) / rx2 + (dy * dy) / ry2
+  const b = 2 * ((fx * dx) / rx2 + (fy * dy) / ry2)
+  const c = (fx * fx) / rx2 + (fy * fy) / ry2 - 1
+
+  let discriminant = b * b - 4 * a * c
+  if (discriminant < 0) return []
+
+  const results: Vector2[] = []
+  discriminant = Math.sqrt(discriminant)
+
+  const t1 = (-b - discriminant) / (2 * a)
+  const t2 = (-b + discriminant) / (2 * a)
+
+  if (t1 >= 0 && t1 <= 1) results.push(new Vector2(lineStart.x + dx * t1, lineStart.y + dy * t1))
+  if (t2 >= 0 && t2 <= 1 && Math.abs(t2 - t1) > EPSILON) {
+    results.push(new Vector2(lineStart.x + dx * t2, lineStart.y + dy * t2))
+  }
+
+  return results
+}
+
 /** AABB overlap test (convenience wrapper around {@link BoundingBox.intersects}). */
 export function intersectsAABB(a: BoundingBox, b: BoundingBox): boolean {
   return a.intersects(b)
