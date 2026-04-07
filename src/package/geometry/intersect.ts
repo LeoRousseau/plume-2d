@@ -1,6 +1,6 @@
 import { Vector2 } from '../math/Vector2'
 import type { BoundingBox } from '../math/BoundingBox'
-import { EPSILON } from '../math/constants'
+import { EPSILON, TWO_PI } from '../math/constants'
 
 /**
  * Finds the intersection point of two line segments, or `null` if they don't intersect.
@@ -82,6 +82,34 @@ export function intersectCircleCircle(
 
   if (Math.abs(h) < EPSILON) return [mid]
   return [mid.add(perp.scale(h)), mid.add(perp.scale(-h))]
+}
+
+/** Returns true if `angle` falls within the arc sweep from `startAngle` to `endAngle`. */
+function isAngleInArc(angle: number, startAngle: number, endAngle: number): boolean {
+  const sweep = Math.abs(endAngle - startAngle)
+  if (sweep >= TWO_PI - EPSILON) return true
+
+  const normalize = (a: number) => ((a % TWO_PI) + TWO_PI) % TWO_PI
+  const s = normalize(startAngle)
+  const e = normalize(endAngle)
+  const a = normalize(angle)
+  if (s <= e) return a >= s - EPSILON && a <= e + EPSILON
+  return a >= s - EPSILON || a <= e + EPSILON
+}
+
+/**
+ * Finds intersection points between a line segment and a circular arc.
+ * Returns 0, 1, or 2 points.
+ */
+export function intersectLineArc(
+  lineStart: Vector2, lineEnd: Vector2,
+  arc: { center: Vector2; radius: number; startAngle: number; endAngle: number },
+): Vector2[] {
+  const pts = intersectLineCircle(lineStart, lineEnd, arc)
+  return pts.filter(p => {
+    const angle = Math.atan2(p.y - arc.center.y, p.x - arc.center.x)
+    return isAngleInArc(angle, arc.startAngle, arc.endAngle)
+  })
 }
 
 /** AABB overlap test (convenience wrapper around {@link BoundingBox.intersects}). */
