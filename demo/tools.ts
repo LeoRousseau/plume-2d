@@ -196,6 +196,12 @@ export function handlePathUp(pos: Vector2, ctx: DrawContext): void {
 
   if (pathHasPreview) {
     pathBuilder.segments.pop()
+  }
+
+  const dragDist = Math.sqrt(
+    (pos.x - pathDragStart.x) ** 2 + (pos.y - pathDragStart.y) ** 2,
+  )
+  if (pathHasPreview && dragDist > 3) {
     pathBuilder.quadraticTo(pos, pathDragStart)
   } else {
     pathBuilder.lineTo(pathDragStart)
@@ -209,6 +215,10 @@ export function handlePathUp(pos: Vector2, ctx: DrawContext): void {
 
 export function handlePathDblClick(ctx: DrawContext): void {
   if (ctx.toolState.activeTool !== 'path') return
+  if (pathBuilder && pathBuilder.segments.length >= 3) {
+    pathBuilder.close()
+    pathBuilder.fill = resolveFill(ctx.toolState.fill, pathBuilder)
+  }
   pathBuilder = null
   pathLastPoint = null
   pathDragStart = null

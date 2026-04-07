@@ -133,6 +133,16 @@ for (const tb of toolButtons) {
 // Keyboard shortcuts
 document.addEventListener('keydown', (e) => {
   if (e.target instanceof HTMLInputElement || e.target instanceof HTMLSelectElement) return
+  if (e.key === 'Enter') {
+    if (toolState.activeTool === 'polyline') {
+      handlePolylineDblClick(drawCtx)
+      sceneTree.refresh()
+    } else if (toolState.activeTool === 'path') {
+      handlePathDblClick(drawCtx)
+      sceneTree.refresh()
+    }
+    return
+  }
   if (e.key === 'Delete' || e.key === 'Backspace') {
     const sel = sceneTree.selected()
     if (sel) {
