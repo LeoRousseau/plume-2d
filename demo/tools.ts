@@ -159,8 +159,10 @@ export function handlePolylineDblClick(ctx: DrawContext): void {
 
 let pathBuilder: Path | null = null
 let pathLastPoint: Vector2 | null = null
+let pathDragStart: Vector2 | null = null
+let pathHasPreview = false
 
-export function handlePathClick(pos: Vector2, ctx: DrawContext): void {
+export function handlePathDown(pos: Vector2, ctx: DrawContext): void {
   if (ctx.toolState.activeTool !== 'path') return
   if (!pathBuilder) {
     pathBuilder = new Path()
@@ -169,10 +171,39 @@ export function handlePathClick(pos: Vector2, ctx: DrawContext): void {
     pathBuilder.fill = ctx.toolState.fill ? { ...ctx.toolState.fill } : null
     ctx.scene.root.addChild(pathBuilder)
     pathLastPoint = pos
+    ctx.render()
   } else {
-    pathBuilder.lineTo(pos)
-    pathLastPoint = pos
+    pathDragStart = pos
+    pathHasPreview = false
   }
+}
+
+export function handlePathDrag(pos: Vector2, ctx: DrawContext): void {
+  if (ctx.toolState.activeTool !== 'path') return
+  if (!pathBuilder || !pathDragStart) return
+
+  if (pathHasPreview) {
+    pathBuilder.segments.pop()
+  }
+  pathBuilder.segments.push({ type: 'quadraticTo', control: pos, point: pathDragStart })
+  pathHasPreview = true
+  ctx.render()
+}
+
+export function handlePathUp(pos: Vector2, ctx: DrawContext): void {
+  if (ctx.toolState.activeTool !== 'path') return
+  if (!pathBuilder || !pathDragStart) return
+
+  if (pathHasPreview) {
+    pathBuilder.segments.pop()
+    pathBuilder.quadraticTo(pos, pathDragStart)
+  } else {
+    pathBuilder.lineTo(pathDragStart)
+  }
+
+  pathLastPoint = pathDragStart
+  pathDragStart = null
+  pathHasPreview = false
   ctx.render()
 }
 
@@ -180,6 +211,8 @@ export function handlePathDblClick(ctx: DrawContext): void {
   if (ctx.toolState.activeTool !== 'path') return
   pathBuilder = null
   pathLastPoint = null
+  pathDragStart = null
+  pathHasPreview = false
   ctx.render()
 }
 
@@ -215,4 +248,6 @@ export function cancelDraw(ctx: DrawContext): void {
   polylinePoints = []
   pathBuilder = null
   pathLastPoint = null
+  pathDragStart = null
+  pathHasPreview = false
 }

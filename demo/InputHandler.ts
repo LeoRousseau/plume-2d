@@ -98,7 +98,7 @@ export class InputHandler {
         // Fire onClick only if drag distance was negligible (click, not drag)
         const dx = e.clientX - this.dragStartScreen.x
         const dy = e.clientY - this.dragStartScreen.y
-        if (Math.sqrt(dx * dx + dy * dy) < 3) {
+        if (Math.sqrt(dx * dx + dy * dy) < 5) {
           this.onClick?.(scenePos)
         }
       }

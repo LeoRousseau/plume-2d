@@ -6,7 +6,7 @@ import { InputHandler } from './InputHandler'
 import {
   createToolState, handleDrawStart, handleDrawMove, handleDrawEnd,
   handlePolylineClick, handlePolylineDblClick, handleTextClick,
-  handlePathClick, handlePathDblClick,
+  handlePathDown, handlePathDrag, handlePathUp, handlePathDblClick,
   cancelDraw,
 } from './tools'
 import type { ToolType, DrawContext } from './tools'
@@ -49,17 +49,29 @@ const input = new InputHandler(canvasEl, view, render)
 
 input.onMouseDown = (pos) => {
   if (toolState.activeTool === 'polyline') return
-  if (toolState.activeTool === 'path') return
   if (toolState.activeTool === 'text') return
   if (toolState.activeTool === 'select') return
+  if (toolState.activeTool === 'path') {
+    handlePathDown(pos, drawCtx)
+    return
+  }
   handleDrawStart(pos, drawCtx)
 }
 
 input.onDrag = (pos) => {
+  if (toolState.activeTool === 'path') {
+    handlePathDrag(pos, drawCtx)
+    return
+  }
   handleDrawMove(pos, drawCtx)
 }
 
 input.onMouseUp = (pos) => {
+  if (toolState.activeTool === 'path') {
+    handlePathUp(pos, drawCtx)
+    sceneTree.refresh()
+    return
+  }
   handleDrawEnd(pos, drawCtx)
   sceneTree.refresh()
 }
@@ -79,9 +91,6 @@ input.onClick = (pos) => {
     sceneTree.refresh()
   } else if (toolState.activeTool === 'text') {
     handleTextClick(pos, drawCtx)
-    sceneTree.refresh()
-  } else if (toolState.activeTool === 'path') {
-    handlePathClick(pos, drawCtx)
     sceneTree.refresh()
   }
 }
