@@ -149,6 +149,38 @@ export function intersectLineEllipse(
   return results
 }
 
+/**
+ * Finds intersection points between a full circle and a circular arc.
+ * Returns 0, 1, or 2 points.
+ */
+export function intersectCircleArc(
+  circle: { center: Vector2; radius: number },
+  arc: { center: Vector2; radius: number; startAngle: number; endAngle: number },
+): Vector2[] {
+  const pts = intersectCircleCircle(circle, arc)
+  return pts.filter(p => {
+    const angle = Math.atan2(p.y - arc.center.y, p.x - arc.center.x)
+    return isAngleInArc(angle, arc.startAngle, arc.endAngle)
+  })
+}
+
+/**
+ * Finds intersection points between two circular arcs.
+ * Returns 0, 1, or 2 points.
+ */
+export function intersectArcArc(
+  a1: { center: Vector2; radius: number; startAngle: number; endAngle: number },
+  a2: { center: Vector2; radius: number; startAngle: number; endAngle: number },
+): Vector2[] {
+  const pts = intersectCircleCircle(a1, a2)
+  return pts.filter(p => {
+    const angle1 = Math.atan2(p.y - a1.center.y, p.x - a1.center.x)
+    const angle2 = Math.atan2(p.y - a2.center.y, p.x - a2.center.x)
+    return isAngleInArc(angle1, a1.startAngle, a1.endAngle)
+        && isAngleInArc(angle2, a2.startAngle, a2.endAngle)
+  })
+}
+
 /** AABB overlap test (convenience wrapper around {@link BoundingBox.intersects}). */
 export function intersectsAABB(a: BoundingBox, b: BoundingBox): boolean {
   return a.intersects(b)

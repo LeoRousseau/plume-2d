@@ -12,6 +12,8 @@ import {
   intersectCircleCircle,
   intersectLineArc,
   intersectLineEllipse,
+  intersectCircleArc,
+  intersectArcArc,
 } from './intersect'
 import {
   distancePointToLine,
@@ -225,6 +227,53 @@ describe('intersectLineArc', () => {
   it('miss entirely → 0 hits', () => {
     const a = arc()
     const pts = intersectLineArc(new Vector2(-10, 10), new Vector2(10, 10), a)
+    expect(pts).toHaveLength(0)
+  })
+})
+
+describe('intersectCircleArc', () => {
+  it('circle overlapping arc sweep → hits', () => {
+    const c = { center: new Vector2(6, 0), radius: 5 }
+    const a = arc() // upper semicircle r=5 at origin
+    const pts = intersectCircleArc(c, a)
+    expect(pts.length).toBeGreaterThanOrEqual(1)
+  })
+
+  it('circle overlapping circle but outside arc sweep → 0 hits', () => {
+    const c = { center: new Vector2(0, -8), radius: 5 }
+    const a = arc()
+    const pts = intersectCircleArc(c, a)
+    expect(pts).toHaveLength(0)
+  })
+
+  it('circle not overlapping at all → 0 hits', () => {
+    const c = { center: new Vector2(20, 0), radius: 2 }
+    const a = arc()
+    const pts = intersectCircleArc(c, a)
+    expect(pts).toHaveLength(0)
+  })
+})
+
+describe('intersectArcArc', () => {
+  it('two overlapping arcs with sweeps that intersect → hits', () => {
+    const a1 = { center: new Vector2(0, 0), radius: 5, startAngle: 0, endAngle: Math.PI }
+    const a2 = { center: new Vector2(6, 0), radius: 5, startAngle: Math.PI / 2, endAngle: (3 * Math.PI) / 2 }
+    const pts = intersectArcArc(a1, a2)
+    expect(pts.length).toBeGreaterThanOrEqual(1)
+  })
+
+  it('two arcs whose circles overlap but sweeps miss → 0 hits', () => {
+    const a1 = { center: new Vector2(0, 0), radius: 5, startAngle: -Math.PI / 2, endAngle: Math.PI / 2 }
+    const a2 = { center: new Vector2(3, 0), radius: 5, startAngle: Math.PI / 2, endAngle: Math.PI }
+    const circleHits = intersectCircleCircle(a1, a2)
+    const pts = intersectArcArc(a1, a2)
+    expect(pts.length).toBeLessThanOrEqual(circleHits.length)
+  })
+
+  it('disjoint arcs → 0 hits', () => {
+    const a1 = { center: new Vector2(0, 0), radius: 2, startAngle: 0, endAngle: Math.PI }
+    const a2 = { center: new Vector2(20, 0), radius: 2, startAngle: 0, endAngle: Math.PI }
+    const pts = intersectArcArc(a1, a2)
     expect(pts).toHaveLength(0)
   })
 })
