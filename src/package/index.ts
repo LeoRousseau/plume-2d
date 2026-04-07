@@ -40,7 +40,7 @@ export { SVGRenderer } from './renderer/SVGRenderer'
 
 // Geometry utilities
 export { distancePointToLine, distancePointToPolyline, distancePointToCircle, distancePointToSegment, distancePointToPolylineEdge, distancePointToRectEdge, distancePointToPathEdge, closestPointOnLine, closestPointOnPolyline } from './geometry/distance'
-export { intersectLineLine, intersectLineCircle, intersectCircleCircle } from './geometry/intersect'
+export { intersectLineLine, intersectLineCircle, intersectCircleCircle, intersectLineArc, intersectLineEllipse, intersectCircleArc, intersectArcArc, intersect } from './geometry/intersect'
 
 // Parser
 export { parseSVG, parseSVGToNode, parsePathData } from './parser/SVGParser'
