@@ -14,6 +14,7 @@ import {
   intersectLineEllipse,
   intersectCircleArc,
   intersectArcArc,
+  intersect,
 } from './intersect'
 import {
   distancePointToLine,
@@ -615,5 +616,137 @@ describe('Shape.distanceToEdge – cross-check all entities', () => {
     for (const s of shapes) {
       expect(s.distanceToEdge(far)).toBeGreaterThan(50)
     }
+  })
+})
+
+describe('intersect – generic dispatcher', () => {
+  it('Circle × Circle', () => {
+    const c1 = new Circle(new Vector2(0, 0), 5)
+    const c2 = new Circle(new Vector2(6, 0), 5)
+    const pts = intersect(c1, c2)
+    expect(pts).toHaveLength(2)
+  })
+
+  it('Circle × Arc', () => {
+    const c = new Circle(new Vector2(6, 0), 5)
+    const a = arc()
+    const pts = intersect(c, a)
+    expect(pts.length).toBeGreaterThanOrEqual(1)
+  })
+
+  it('Arc × Circle (reversed)', () => {
+    const c = new Circle(new Vector2(6, 0), 5)
+    const a = arc()
+    const pts = intersect(a, c)
+    expect(pts.length).toBeGreaterThanOrEqual(1)
+  })
+
+  it('Arc × Arc', () => {
+    const a1 = new Arc(new Vector2(0, 0), 5, 0, Math.PI)
+    const a2 = new Arc(new Vector2(6, 0), 5, Math.PI / 2, (3 * Math.PI) / 2)
+    const pts = intersect(a1, a2)
+    expect(pts.length).toBeGreaterThanOrEqual(1)
+  })
+
+  it('Circle × Rectangle', () => {
+    const c = new Circle(new Vector2(0, 0), 6)
+    const r = rect()
+    const pts = intersect(c, r)
+    expect(pts.length).toBeGreaterThanOrEqual(4)
+  })
+
+  it('Circle × Polyline', () => {
+    const c = new Circle(new Vector2(0, 5), 6)
+    const pts = intersect(c, polyline())
+    expect(pts.length).toBeGreaterThanOrEqual(2)
+  })
+
+  it('Circle × Path', () => {
+    const c = new Circle(new Vector2(0, 5), 6)
+    const pts = intersect(c, path())
+    expect(pts.length).toBeGreaterThanOrEqual(2)
+  })
+
+  it('Circle × Ellipse', () => {
+    const c = new Circle(new Vector2(5, 0), 3)
+    const e = ellipse()
+    const pts = intersect(c, e)
+    expect(pts.length).toBeGreaterThanOrEqual(1)
+  })
+
+  it('Ellipse × Rectangle', () => {
+    const e = new Ellipse(new Vector2(0, 0), 6, 6)
+    const r = rect()
+    const pts = intersect(e, r)
+    expect(pts.length).toBeGreaterThanOrEqual(4)
+  })
+
+  it('Rectangle × Rectangle', () => {
+    const r1 = new Rectangle(new Vector2(0, 0), 10, 10)
+    const r2 = new Rectangle(new Vector2(5, 5), 10, 10)
+    const pts = intersect(r1, r2)
+    expect(pts.length).toBeGreaterThanOrEqual(2)
+  })
+
+  it('Rectangle × Polyline', () => {
+    const r = new Rectangle(new Vector2(-2, -2), 4, 6)
+    const pts = intersect(r, polyline())
+    expect(pts.length).toBeGreaterThanOrEqual(2)
+  })
+
+  it('Polyline × Polyline', () => {
+    const p1 = new Polyline([new Vector2(0, -5), new Vector2(0, 15)])
+    const pts = intersect(p1, polyline())
+    expect(pts).toHaveLength(2)
+  })
+
+  it('Polyline × Path', () => {
+    const p1 = new Polyline([new Vector2(0, -5), new Vector2(0, 15)])
+    const pts = intersect(p1, path())
+    expect(pts).toHaveLength(2)
+  })
+
+  it('Path × Path', () => {
+    const p1 = new Path().moveTo(new Vector2(0, -5)).lineTo(new Vector2(0, 15))
+    const pts = intersect(p1, path())
+    expect(pts).toHaveLength(2)
+  })
+
+  it('Arc × Rectangle', () => {
+    const a = new Arc(new Vector2(0, 0), 6, 0, Math.PI)
+    const r = rect()
+    const pts = intersect(a, r)
+    expect(pts.length).toBeGreaterThanOrEqual(2)
+  })
+
+  it('Arc × Polyline', () => {
+    const a = new Arc(new Vector2(0, 5), 6, 0, Math.PI)
+    const pts = intersect(a, polyline())
+    expect(pts.length).toBeGreaterThanOrEqual(1)
+  })
+
+  it('Ellipse × Polyline', () => {
+    const e = new Ellipse(new Vector2(0, 5), 6, 6)
+    const pts = intersect(e, polyline())
+    expect(pts.length).toBeGreaterThanOrEqual(2)
+  })
+
+  it('Ellipse × Ellipse', () => {
+    const e1 = new Ellipse(new Vector2(0, 0), 5, 3)
+    const e2 = new Ellipse(new Vector2(3, 0), 5, 3)
+    const pts = intersect(e1, e2)
+    expect(pts.length).toBeGreaterThanOrEqual(2)
+  })
+
+  it('disjoint shapes → 0 hits', () => {
+    const c = new Circle(new Vector2(100, 100), 1)
+    const r = rect()
+    expect(intersect(c, r)).toHaveLength(0)
+  })
+
+  it('commutative: Circle × Rect = Rect × Circle', () => {
+    const c = new Circle(new Vector2(0, 0), 6)
+    const r = rect()
+    expect(intersect(c, r).length).toBe(intersect(r, c).length)
   })
 })

@@ -1,6 +1,13 @@
 import { Vector2 } from '../math/Vector2'
 import type { BoundingBox } from '../math/BoundingBox'
-import { EPSILON, TWO_PI } from '../math/constants'
+import { EPSILON, TWO_PI, CURVE_SUBDIVISIONS } from '../math/constants'
+import { AShape } from '../entity/Shape'
+import { Circle } from '../entity/Circle'
+import { Arc } from '../entity/Arc'
+import { Ellipse } from '../entity/Ellipse'
+import { Rectangle } from '../entity/Rectangle'
+import { Polyline } from '../entity/Polyline'
+import { Path } from '../entity/Path'
 
 /**
  * Finds the intersection point of two line segments, or `null` if they don't intersect.
@@ -179,6 +186,125 @@ export function intersectArcArc(
     return isAngleInArc(angle1, a1.startAngle, a1.endAngle)
         && isAngleInArc(angle2, a2.startAngle, a2.endAngle)
   })
+}
+
+type Seg = [Vector2, Vector2]
+
+/** Extracts line segments from any shape. */
+function toSegments(shape: AShape, steps = CURVE_SUBDIVISIONS): Seg[] {
+  if (shape instanceof Rectangle) {
+    const { x, y } = shape.origin
+    const w = shape.width, h = shape.height
+    const tl = new Vector2(x, y), tr = new Vector2(x + w, y)
+    const br = new Vector2(x + w, y + h), bl = new Vector2(x, y + h)
+    return [[tl, tr], [tr, br], [br, bl], [bl, tl]]
+  }
+  if (shape instanceof Polyline) {
+    const segs: Seg[] = []
+    const count = shape.segmentCount()
+    for (let i = 0; i < count; i++) segs.push(shape.segmentAt(i))
+    return segs
+  }
+  if (shape instanceof Path) {
+    const pts = shape.toPolylinePoints(steps)
+    const segs: Seg[] = []
+    for (let i = 0; i < pts.length - 1; i++) segs.push([pts[i], pts[i + 1]])
+    const last = shape.segments[shape.segments.length - 1]
+    if (last && last.type === 'close' && pts.length >= 2) {
+      segs.push([pts[pts.length - 1], pts[0]])
+    }
+    return segs
+  }
+  // Circle, Arc, Ellipse — linearize via toPath
+  const pathShape = shape.toPath()
+  const pts = pathShape.toPolylinePoints(steps)
+  const segs: Seg[] = []
+  for (let i = 0; i < pts.length - 1; i++) segs.push([pts[i], pts[i + 1]])
+  const lastSeg = pathShape.segments[pathShape.segments.length - 1]
+  if (lastSeg && lastSeg.type === 'close' && pts.length >= 2) {
+    segs.push([pts[pts.length - 1], pts[0]])
+  }
+  return segs
+}
+
+function intersectSegmentsVsSegments(segsA: Seg[], segsB: Seg[]): Vector2[] {
+  const results: Vector2[] = []
+  for (const [a1, a2] of segsA) {
+    for (const [b1, b2] of segsB) {
+      const p = intersectLineLine(a1, a2, b1, b2)
+      if (p) results.push(p)
+    }
+  }
+  return results
+}
+
+function intersectCircleVsSegments(
+  circle: { center: Vector2; radius: number },
+  segs: Seg[],
+): Vector2[] {
+  const results: Vector2[] = []
+  for (const [a, b] of segs) results.push(...intersectLineCircle(a, b, circle))
+  return results
+}
+
+function intersectArcVsSegments(
+  arc: { center: Vector2; radius: number; startAngle: number; endAngle: number },
+  segs: Seg[],
+): Vector2[] {
+  const results: Vector2[] = []
+  for (const [a, b] of segs) results.push(...intersectLineArc(a, b, arc))
+  return results
+}
+
+function intersectEllipseVsSegments(
+  ellipse: { center: Vector2; rx: number; ry: number },
+  segs: Seg[],
+): Vector2[] {
+  const results: Vector2[] = []
+  for (const [a, b] of segs) results.push(...intersectLineEllipse(a, b, ellipse))
+  return results
+}
+
+/**
+ * Generic intersection dispatcher for any two shapes.
+ * Returns all intersection points between the boundaries of `a` and `b`.
+ */
+export function intersect(a: AShape, b: AShape): Vector2[] {
+  // Circle × Circle
+  if (a instanceof Circle && b instanceof Circle) return intersectCircleCircle(a, b)
+
+  // Circle × Arc / Arc × Circle
+  if (a instanceof Circle && b instanceof Arc) return intersectCircleArc(a, b)
+  if (a instanceof Arc && b instanceof Circle) return intersectCircleArc(b, a)
+
+  // Arc × Arc
+  if (a instanceof Arc && b instanceof Arc) return intersectArcArc(a, b)
+
+  // Circle × Ellipse / Ellipse × Circle → linearize ellipse
+  if (a instanceof Circle && b instanceof Ellipse) return intersectCircleVsSegments(a, toSegments(b))
+  if (a instanceof Ellipse && b instanceof Circle) return intersectCircleVsSegments(b, toSegments(a))
+
+  // Arc × Ellipse / Ellipse × Arc → linearize ellipse
+  if (a instanceof Arc && b instanceof Ellipse) return intersectArcVsSegments(a, toSegments(b))
+  if (a instanceof Ellipse && b instanceof Arc) return intersectArcVsSegments(b, toSegments(a))
+
+  // Ellipse × Ellipse → linearize both
+  if (a instanceof Ellipse && b instanceof Ellipse) return intersectSegmentsVsSegments(toSegments(a), toSegments(b))
+
+  // Circle × segment-based shape
+  if (a instanceof Circle) return intersectCircleVsSegments(a, toSegments(b))
+  if (b instanceof Circle) return intersectCircleVsSegments(b, toSegments(a))
+
+  // Arc × segment-based shape
+  if (a instanceof Arc) return intersectArcVsSegments(a, toSegments(b))
+  if (b instanceof Arc) return intersectArcVsSegments(b, toSegments(a))
+
+  // Ellipse × segment-based shape
+  if (a instanceof Ellipse) return intersectEllipseVsSegments(a, toSegments(b))
+  if (b instanceof Ellipse) return intersectEllipseVsSegments(b, toSegments(a))
+
+  // Both segment-based (Rectangle, Polyline, Path)
+  return intersectSegmentsVsSegments(toSegments(a), toSegments(b))
 }
 
 /** AABB overlap test (convenience wrapper around {@link BoundingBox.intersects}). */
