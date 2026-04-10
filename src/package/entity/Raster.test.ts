@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { Raster } from './Raster'
 import { Vector2 } from '../math/Vector2'
-import { Scene } from '../core/Scene'
+import { Scene } from '../base/Scene'
 import { pick } from '../hitTest/HitTest'
 import type { IRenderer } from '../renderer/IRenderer'
 

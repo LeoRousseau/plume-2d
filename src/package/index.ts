@@ -4,10 +4,10 @@ export { Matrix } from './math/Matrix'
 export { BoundingBox } from './math/BoundingBox'
 export { TWO_PI, EPSILON, MATRIX_EPSILON, CURVE_SUBDIVISIONS, DEFAULT_HIT_TOLERANCE, TEXT_CHAR_WIDTH_RATIO, TEXT_ALPHABETIC_RATIO } from './math/constants'
 
-// Core
-export { Node } from './core/Node'
-export { Transform } from './core/Transform'
-export { Scene } from './core/Scene'
+// Base
+export { Node } from './base/Node'
+export { Transform } from './base/Transform'
+export { Scene } from './base/Scene'
 
 // Entity
 export { ARenderable } from './entity/Renderable'

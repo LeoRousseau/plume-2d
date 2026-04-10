@@ -1,6 +1,6 @@
 import { Vector2 } from '../math/Vector2'
-import { Node } from '../core/Node'
-import { Scene } from '../core/Scene'
+import { Node } from '../base/Node'
+import { Scene } from '../base/Scene'
 import { Circle } from '../entity/Circle'
 import { Ellipse } from '../entity/Ellipse'
 import { Rectangle } from '../entity/Rectangle'

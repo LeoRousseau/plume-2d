@@ -1,4 +1,4 @@
-import type { Scene } from '../core/Scene'
+import type { Scene } from '../base/Scene'
 import type { View } from '../view/View'
 import type { AShape } from '../entity/Shape'
 import type { Polyline } from '../entity/Polyline'

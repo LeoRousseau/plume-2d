@@ -1,4 +1,4 @@
-import { Node } from '../core/Node'
+import { Node } from '../base/Node'
 import type { IRenderer } from '../renderer/IRenderer'
 import type { BoundingBox } from '../math/BoundingBox'
 import type { StrokeStyle } from './StrokeStyle'

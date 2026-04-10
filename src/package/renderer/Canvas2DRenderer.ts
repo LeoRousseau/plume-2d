@@ -1,5 +1,5 @@
-import { Node } from '../core/Node'
-import type { Scene } from '../core/Scene'
+import { Node } from '../base/Node'
+import type { Scene } from '../base/Scene'
 import type { View } from '../view/View'
 import { TWO_PI } from '../math/constants'
 import { ARenderable } from '../entity/Renderable'
