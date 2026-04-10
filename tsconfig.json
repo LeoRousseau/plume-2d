@@ -13,7 +13,7 @@
     "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "baseUrl": ".",
     "paths": {
-      "@plume/*": ["src/package/*"]
+      "@plume/*": ["src/package/core/*"]
     }
   },
   "include": ["src", "demo"]

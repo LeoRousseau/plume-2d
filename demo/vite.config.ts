@@ -5,7 +5,7 @@ export default defineConfig({
   root: resolve(__dirname),
   resolve: {
     alias: {
-      '@plume': resolve(__dirname, '../src/package'),
+      '@plume': resolve(__dirname, '../src/package/core'),
     },
   },
 })
