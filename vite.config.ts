@@ -9,9 +9,10 @@ export default defineConfig({
   },
   build: {
     lib: {
-      entry: resolve(__dirname, 'src/package/core/index.ts'),
+      entry: {
+        'core/plume-2d-core': resolve(__dirname, 'src/package/core/index.ts'),
+      },
       formats: ['es'],
-      fileName: 'plume-2d',
     },
   },
 })

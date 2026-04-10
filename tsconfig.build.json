@@ -4,7 +4,8 @@
     "noEmit": false,
     "declaration": true,
     "emitDeclarationOnly": true,
-    "outDir": "dist"
+    "outDir": "dist/core"
   },
-  "include": ["src/package/core"]
+  "include": ["src/package/core"],
+  "exclude": ["**/*.test.ts"]
 }
